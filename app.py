@@ -122,7 +122,8 @@ Name: "{{group}}\{{#TITLE}}"; Filename: "{{app}}\{{#EXECUTABLE}}"
 Filename: "{{app}}\{{#EXECUTABLE}}"; Description: "Launch application"; Flags: postinstall nowait skipifsilent
 
 [UninstallDelete]
-Type: filesandordirs; Name: "{{localappdata}}\Programs\{{#PACKAGE_NAME}}\""""
+Type: filesandordirs; Name: "{{localappdata}}\{{#PACKAGE_NAME}}"
+"""
   inno_config_path = os.path.join(path, 'config.iss')
   with open(inno_config_path, 'w') as f:
     f.write(inno_config)
