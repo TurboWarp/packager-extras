@@ -25,7 +25,14 @@ def parse_package_json(path):
     return json.load(package_json_file)
 
 def run_command(args, check=True):
-  completed = subprocess.run(args, stdout=sys.stdout, stderr=sys.stderr, check=check)
+  completed = subprocess.run(
+    args,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    stdin=subprocess.PIPE,
+    creationflags=subprocess.CREATE_NO_WINDOW,
+    check=check
+  )
   print(completed)
   return completed
 
