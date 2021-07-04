@@ -7,10 +7,12 @@ import tempfile
 import traceback
 import re
 import shutil
+import urllib.request
 import PyQt5.QtCore as QtCore
 import PyQt5.QtWidgets as QtWidgets
 
 VERSION = '0.1.0'
+ENABLE_UPDATE_CHECKER = True
 
 def get_executable_name(path):
   for f in os.listdir(path):
@@ -183,6 +185,7 @@ class BaseThread(QtCore.QThread):
       traceback.print_exc()
       self.error.emit(str(e))
 
+
 class ExtractWorker(BaseThread):
   extracted = QtCore.pyqtSignal(str)
 
@@ -236,6 +239,17 @@ class OptionsWorker(BaseThread):
       reveal_in_explorer(self.installer_destination)
     elif self.should_fix_icon:
       reveal_in_explorer(self.filename)
+
+
+class UpdateCheckerWorker(BaseThread):
+  update_available = QtCore.pyqtSignal()
+
+  def _run(self):
+    with urllib.request.urlopen('https://raw.githubusercontent.com/TurboWarp/packager-extras/master/version.json') as response:
+      contents = response.read()
+      parsed = json.loads(contents)
+      if parsed['latest'] != VERSION:
+        self.update_available.emit()
 
 
 class ExtractingWidget(QtWidgets.QWidget):
@@ -427,6 +441,11 @@ class MainWindow(QtWidgets.QWidget):
     self.select_widget.file_selected.connect(self.on_file_selected)
     layout.addWidget(self.select_widget)
 
+    if ENABLE_UPDATE_CHECKER:
+      self.update_checker_worker = UpdateCheckerWorker()
+      self.update_checker_worker.update_available.connect(self.update_available)
+      self.update_checker_worker.start()
+
     self.configure_widget = None
 
   def dragEnterEvent(self, event):
@@ -457,6 +476,14 @@ class MainWindow(QtWidgets.QWidget):
     self.configure_widget.deleteLater()
     self.configure_widget = None
     self.layout().addWidget(self.select_widget)
+
+  def update_available(self):
+    print('An update is available')
+    msg = QtWidgets.QMessageBox()
+    msg.setIcon(QtWidgets.QMessageBox.Information)
+    msg.setWindowTitle('Update Available')
+    msg.setText('An update is available. Visit <a href="https://github.com/TurboWarp/packager-extras/releases">https://github.com/TurboWarp/packager-extras/releases</a> to find out more.')
+    msg.exec_()
 
 
 def main():
