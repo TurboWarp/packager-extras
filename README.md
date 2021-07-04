@@ -7,7 +7,7 @@ Extra utilities to use after running the TurboWarp Packager. Currently, it can:
 
 This only works on Windows systems.
 
-Written in Python and PyQt5.
+Written in Python (only tested on 3.8.0) and PyQt5.
 
 ```bash
 # Setup virtual env
