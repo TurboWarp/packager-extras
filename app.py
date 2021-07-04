@@ -40,6 +40,16 @@ def fix_icon(path):
     '-file:' + icon_file
   ])
 
+def escape_html(string):
+  return (
+     string
+      .replace('&', '&amp;')
+      .replace('>', '&gt;')
+      .replace('<', '&lt;')
+      .replace('\'','&apos;')
+      .replace('"','&quot;')
+  )
+
 def unescape_html(string):
   return (
     string
@@ -227,9 +237,17 @@ class OptionsWorker(BaseThread):
 
 
 class ExtractingWidget(QtWidgets.QWidget):
-  def __init__(self, parent):
-    super().__init__(parent)
-    label = QtWidgets.QLabel('Extracting...', self)
+  def __init__(self):
+    super().__init__()
+
+    layout = QtWidgets.QHBoxLayout()
+    layout.setContentsMargins(0, 0, 0, 0)
+    self.setLayout(layout)
+
+    label = QtWidgets.QLabel('Extracting...')
+    label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Expanding)
+    label.setAlignment(QtCore.Qt.AlignCenter)
+    layout.addWidget(label)
 
 
 class ProgressWidget(QtWidgets.QWidget):
@@ -246,7 +264,7 @@ class ProgressWidget(QtWidgets.QWidget):
 
     self.text_edit = QtWidgets.QTextEdit()
     self.text_edit.setReadOnly(True)
-    self.text_edit.setFixedHeight(100)
+    self.text_edit.setFixedHeight(80)
     layout.addWidget(self.text_edit)
 
   def handle_progress_update(self, text):
@@ -266,7 +284,8 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     layout.setContentsMargins(0, 0, 0, 0)
     self.setLayout(layout)
 
-    self.extracting_widget = ExtractingWidget(self)
+    self.extracting_widget = ExtractingWidget()
+    layout.addWidget(self.extracting_widget)
     self.progress_widget = None
 
     extract_worker = ExtractWorker(self, self.filename, self.temporary_directory.name)
@@ -280,8 +299,8 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     self.extracted_contents = extracted_contents
 
     label = QtWidgets.QLabel()
-    # TODO: make sure that weird names cant use fancy formatting
-    label.setText(f'Opened: <b>{os.path.basename(self.filename)}</b>')
+    label.setText(f'Opened: <b>{escape_html(os.path.basename(self.filename))}</b>')
+    label.setFixedHeight(label.sizeHint().height())
     layout.addWidget(label)
 
     self.fix_icon_checkbox = QtWidgets.QCheckBox('Fix icon of .exe')
@@ -294,7 +313,13 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
 
     self.ok_button = QtWidgets.QPushButton('Continue')
     self.ok_button.clicked.connect(self.click)
+    self.ok_button.setFixedHeight(self.ok_button.sizeHint().height() * 2)
     layout.addWidget(self.ok_button)
+
+    self.cancel_button = QtWidgets.QPushButton('Go Back')
+    self.cancel_button.clicked.connect(self.click_cancel)
+    self.cancel_button.setFixedHeight(self.cancel_button.sizeHint().height())
+    layout.addWidget(self.cancel_button)
 
   def rezip(self):
     print('Recompressing')
@@ -310,9 +335,10 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     return installer_destination
 
   def set_enable_controls(self, enabled):
-    self.fix_icon_checkbox.setEnabled(enabled)
-    self.create_installer_checkbox.setEnabled(enabled)
-    self.ok_button.setEnabled(enabled)
+    self.fix_icon_checkbox.setVisible(enabled)
+    self.create_installer_checkbox.setVisible(enabled)
+    self.ok_button.setVisible(enabled)
+    self.cancel_button.setVisible(enabled)
 
   def click(self):
     try:
@@ -336,6 +362,9 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
       self.cleanup()
       handle_error(e)
 
+  def click_cancel(self):
+    self.remove()
+
   def cleanup(self):
     if self.progress_widget:
       self.progress_widget.setParent(None)
@@ -343,11 +372,11 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     self.set_enable_controls(True)
 
   def worker_finished(self):
+    display_success('Success')
     self.cleanup()
-    display_success('Done')
-    self.done()
+    self.remove()
 
-  def done(self):
+  def remove(self):
     self.temporary_directory.cleanup()
     self.finished.emit()
 
@@ -388,8 +417,8 @@ class MainWindow(QtWidgets.QWidget):
     self.setLayout(layout)
 
     label = QtWidgets.QLabel('This is <b>beta software</b>. Please be careful and report bugs. Only run on files you trust.')
-    label.setSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
     label.setWordWrap(True)
+    label.setFixedHeight(label.sizeHint().height())
     layout.addWidget(label)
 
     self.select_widget = SelectWidget()
