@@ -136,6 +136,13 @@ def handle_error(error):
   msg.setText(str(error))
   msg.exec_()
 
+def handle_thread_error(err):
+  msg = QtWidgets.QMessageBox()
+  msg.setIcon(QtWidgets.QMessageBox.Critical)
+  msg.setWindowTitle('Error')
+  msg.setText(err)
+  msg.exec_()
+
 def verify_folder(folder):
   try:
     # Make sure package.json exists and has valid JSON
@@ -154,7 +161,17 @@ def reveal_in_explorer(path):
     path
   ], check=False)
 
-class ExtractWorker(QtCore.QThread):
+class BaseThread(QtCore.QThread):
+  error = QtCore.pyqtSignal(str)
+
+  def run(self):
+    try:
+      self._run()
+    except Exception as e:
+      traceback.print_exc()
+      self.error.emit(str(e))
+
+class ExtractWorker(BaseThread):
   extracted = QtCore.pyqtSignal(str)
 
   def __init__(self, parent, filename, dest):
@@ -162,7 +179,7 @@ class ExtractWorker(QtCore.QThread):
     self.filename = filename
     self.dest = dest
 
-  def run(self):
+  def _run(self):
     with zipfile.ZipFile(self.filename) as zip:
       zip.extractall(self.dest)
       extracted_contents = os.path.join(self.dest, get_zip_inner_folder_name(zip))
@@ -172,7 +189,7 @@ class ExtractWorker(QtCore.QThread):
     self.extracted.emit(extracted_contents)
 
 
-class OptionsWorker(QtCore.QThread):
+class OptionsWorker(BaseThread):
   progress_update = QtCore.pyqtSignal(str)
 
   def __init__(self, parent):
@@ -195,7 +212,7 @@ class OptionsWorker(QtCore.QThread):
     generated_archive_name = shutil.make_archive(temporary_file, 'zip', self.temporary_directory)
     os.replace(generated_archive_name, self.filename)
 
-  def run(self):
+  def _run(self):
     if self.should_fix_icon:
       self.update_progress('Fixing icon')
       fix_icon(self.extracted_contents)
@@ -253,6 +270,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     self.progress_widget = None
 
     extract_worker = ExtractWorker(self, self.filename, self.temporary_directory.name)
+    extract_worker.error.connect(handle_thread_error)
     extract_worker.extracted.connect(self.finished_extract)
     extract_worker.start()
 
@@ -306,6 +324,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
       self.set_enable_controls(False)
 
       worker = OptionsWorker(self)
+      worker.error.connect(handle_thread_error)
 
       self.progress_widget = ProgressWidget()
       self.layout().addWidget(self.progress_widget)
