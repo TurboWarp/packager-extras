@@ -208,11 +208,13 @@ class ProgressWidget(QtWidgets.QWidget):
     layout.setContentsMargins(0, 0, 0, 0)
     self.setLayout(layout)
 
-    label = QtWidgets.QLabel('This may take a while. Please be patient.')
+    label = QtWidgets.QLabel('This may take a while. Please be patient. Avoid closing the application until this process finishes.')
+    label.setWordWrap(True)
     layout.addWidget(label)
 
     self.text_edit = QtWidgets.QTextEdit()
     self.text_edit.setReadOnly(True)
+    self.text_edit.setFixedHeight(100)
     layout.addWidget(self.text_edit)
 
   def handle_progress_update(self, text):
