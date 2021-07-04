@@ -38,15 +38,28 @@ def fix_icon(path):
     '-file:' + icon_file
   ])
 
+def unescape_html(string):
+  return (
+    string
+      .replace('&quot;', '"')
+      .replace('&apos;', '\'')
+      .replace('&lt;', '<')
+      .replace('&gt;', '>')
+      .replace('&amp;', '&')
+  )
+
 def get_project_title(path):
   with open(os.path.join(path, 'index.html')) as f:
     contents = f.read()
     title = re.search(r'<title>(.*)<\/title>', contents).group(1)
-    return title
+    return unescape_html(title)
 
 def escape_inno_value(string):
-  # TODO: implement
-  return string
+  return (
+    string
+      .replace('{', '{{')
+      .replace('"', '')
+  )
 
 def create_installer(path):
   executable_file = get_executable_name(path)
