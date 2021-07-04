@@ -106,6 +106,7 @@ def get_zip_inner_folder_name(zip):
   return info.filename.split('/')[0]
 
 def display_success(message):
+  print(message)
   msg = QtWidgets.QMessageBox()
   msg.setIcon(QtWidgets.QMessageBox.Information)
   msg.setWindowTitle('Success')
