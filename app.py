@@ -432,9 +432,10 @@ class MainWindow(QtWidgets.QWidget):
     layout = QtWidgets.QVBoxLayout()
     self.setLayout(layout)
 
-    label = QtWidgets.QLabel('This is <b>beta software</b>. Please be careful and report bugs. Only run on files you trust.')
+    label = QtWidgets.QLabel('This is <b>beta software</b>. Make sure to <a href="https://github.com/TurboWarp/packager-extras/issues">report bugs</a>. Only run on files you trust.')
     label.setWordWrap(True)
     label.setFixedHeight(label.sizeHint().height())
+    label.setOpenExternalLinks(True)
     layout.addWidget(label)
 
     self.select_widget = SelectWidget()
