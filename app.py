@@ -20,12 +20,15 @@ def parse_package_json(path):
   with open(os.path.join(path, 'package.json')) as package_json_file:
     return json.load(package_json_file)
 
+def run_command(args, check=True):
+  return subprocess.run(args, capture_output=True, check=check)
+
 def fix_icon(path):
   executable_file = os.path.join(path, get_executable_name(path))
   package_json = parse_package_json(path)
   icon_file = os.path.join(path, package_json['window']['icon'])
 
-  resourcer_result = subprocess.run([
+  run_command([
     os.path.join(os.path.dirname(__file__), 'third-party/resourcer/Resourcer.exe'),
     '-op:upd',
     '-src:' + executable_file,
@@ -34,8 +37,6 @@ def fix_icon(path):
     '-lang:1033',
     '-file:' + icon_file
   ])
-  if resourcer_result.returncode != 0:
-    raise Exception(f'Resourcer returned status code: {resourcer_result.returncode}')
 
 def get_project_title(path):
   with open(os.path.join(path, 'index.html')) as f:
@@ -90,12 +91,10 @@ Type: filesandordirs; Name: "{{localappdata}}\Programs\{{#PACKAGE_NAME}}\""""
   with open(inno_config_path, 'w') as f:
     f.write(inno_config)
 
-  inno_result = subprocess.run([
+  run_command([
     os.path.join(os.path.dirname(__file__), 'third-party/inno/iscc.exe'),
     inno_config_path
   ])
-  if inno_result.returncode != 0:
-    raise Exception(f'Inno setup returned status code: {inno_result.returncode}')
 
   expected_output_file = os.path.join(path, output_directory, f'{output_name}.exe')
   if not os.path.exists(expected_output_file):
@@ -133,8 +132,11 @@ def verify_folder(folder):
 def reveal_in_explorer(path):
   path = path.replace('/', '\\')
   print(f'Trying to reveal {path}')
-  os.system(f'explorer.exe /select,"{path}"')
-
+  run_command([
+    'explorer.exe',
+    '/select,',
+    path
+  ], check=False)
 
 class ExtractWorker(QtCore.QThread):
   extracted = QtCore.pyqtSignal(str)
