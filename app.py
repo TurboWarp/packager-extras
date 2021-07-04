@@ -10,6 +10,8 @@ import shutil
 import PyQt5.QtCore as QtCore
 import PyQt5.QtWidgets as QtWidgets
 
+VERSION = '0.1.0'
+
 def get_executable_name(path):
   for f in os.listdir(path):
     if f.endswith('.exe') and f != 'notification_helper.exe':
