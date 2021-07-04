@@ -16,13 +16,6 @@ def get_executable_name(path):
       return f
   raise Exception('Cannot find executable')
 
-def reload_icons():
-  if sys.getwindowsversion().major >= 10:
-    subprocess.run(['ie4uinit.exe', '-show'])
-  else:
-    # untested
-    subprocess.run(['ie4uinit.exe', '-ClearIconCache'])
-
 def parse_package_json(path):
   with open(os.path.join(path, 'package.json')) as package_json_file:
     return json.load(package_json_file)
@@ -43,8 +36,6 @@ def fix_icon(path):
   ])
   if resourcer_result.returncode != 0:
     raise Exception(f'Resourcer returned status code: {resourcer_result.returncode}')
-
-  reload_icons()
 
 def get_project_title(path):
   with open(os.path.join(path, 'index.html')) as f:
