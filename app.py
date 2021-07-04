@@ -213,6 +213,7 @@ class ExtractWorker(BaseThread):
 
 class OptionsWorker(BaseThread):
   progress_update = QtCore.pyqtSignal(str)
+  reveal = QtCore.pyqtSignal(str)
 
   def __init__(self, parent):
     super().__init__(parent)
@@ -243,10 +244,6 @@ class OptionsWorker(BaseThread):
       self.update_progress('Creating installer (very slow!!)')
       generated_installer_path = create_installer(self.extracted_contents)
       os.replace(generated_installer_path, self.installer_destination)
-      reveal_in_explorer(self.installer_destination)
-    elif self.should_fix_icon:
-      reveal_in_explorer(self.filename)
-
 
 class UpdateCheckerWorker(BaseThread):
   update_available = QtCore.pyqtSignal()
@@ -311,6 +308,8 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     layout.addWidget(self.extracting_widget)
     self.progress_widget = None
 
+    self.file_to_reveal = None
+
     extract_worker = ExtractWorker(self, self.filename, self.temporary_directory.name)
     extract_worker.error.connect(handle_thread_error)
     extract_worker.extracted.connect(self.finished_extract)
@@ -355,6 +354,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     installer_destination = QtWidgets.QFileDialog.getSaveFileName(self, 'Select where to save the installer', suggested_path, 'Executable files (*.exe)')[0]
     if not installer_destination:
       raise Exception('No file selected')
+    self.file_to_reveal = installer_destination
     return installer_destination
 
   def set_enable_controls(self, enabled):
@@ -372,6 +372,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
 
       self.set_enable_controls(False)
 
+      self.file_to_reveal = None
       worker = OptionsWorker(self)
       worker.error.connect(handle_thread_error)
 
@@ -396,6 +397,8 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
 
   def worker_finished(self):
     display_success('Success')
+    if self.file_to_reveal:
+      reveal_in_explorer(self.file_to_reveal)
     self.cleanup()
     self.remove()
 
