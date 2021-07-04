@@ -21,7 +21,9 @@ def parse_package_json(path):
     return json.load(package_json_file)
 
 def run_command(args, check=True):
-  return subprocess.run(args, capture_output=True, check=check)
+  completed = subprocess.run(args, stdout=sys.stdout, stderr=sys.stderr, check=check)
+  print(completed)
+  return completed
 
 def fix_icon(path):
   executable_file = os.path.join(path, get_executable_name(path))
