@@ -158,7 +158,7 @@ def handle_error(error):
   msg.setText(str(error))
   msg.exec_()
 
-def handle_thread_error(err):
+def display_error(err):
   msg = QtWidgets.QMessageBox()
   msg.setIcon(QtWidgets.QMessageBox.Critical)
   msg.setWindowTitle('Error')
@@ -214,7 +214,7 @@ class ExtractWorker(BaseThread):
 
 class OptionsWorker(BaseThread):
   progress_update = QtCore.pyqtSignal(str)
-  reveal = QtCore.pyqtSignal(str)
+  success = QtCore.pyqtSignal()
 
   def __init__(self, parent):
     super().__init__(parent)
@@ -245,6 +245,7 @@ class OptionsWorker(BaseThread):
       self.update_progress('Creating installer (very slow!!)')
       generated_installer_path = create_installer(self.extracted_contents)
       os.replace(generated_installer_path, self.installer_destination)
+    self.success.emit()
 
 class UpdateCheckerWorker(BaseThread):
   update_available = QtCore.pyqtSignal()
@@ -312,7 +313,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     self.file_to_reveal = None
 
     extract_worker = ExtractWorker(self, self.filename, self.temporary_directory.name)
-    extract_worker.error.connect(handle_thread_error)
+    extract_worker.error.connect(self.worker_error)
     extract_worker.extracted.connect(self.finished_extract)
     extract_worker.start()
 
@@ -375,13 +376,13 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
 
       self.file_to_reveal = None
       worker = OptionsWorker(self)
-      worker.error.connect(handle_thread_error)
+      worker.error.connect(self.worker_error)
+      worker.success.connect(self.worker_finished)
 
       self.progress_widget = ProgressWidget()
       self.layout().addWidget(self.progress_widget)
 
       worker.progress_update.connect(self.progress_widget.handle_progress_update)
-      worker.finished.connect(self.worker_finished)
       worker.start()
     except Exception as e:
       self.cleanup()
@@ -395,6 +396,10 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
       self.progress_widget.setParent(None)
       self.progress_widget = None
     self.set_enable_controls(True)
+
+  def worker_error(self, err):
+    display_error(err)
+    self.cleanup()
 
   def worker_finished(self):
     display_success('Success')
