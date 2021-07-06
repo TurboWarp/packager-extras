@@ -47,7 +47,7 @@ def fix_icon(path):
   image.save(ico_path, format='ICO')
 
   run_command([
-    os.path.join(os.path.dirname(__file__), 'third-party/rcedit-x86.exe'),
+    os.path.join(os.path.dirname(__file__), 'third-party/rcedit/rcedit-x86.exe'),
     executable_file,
     '--set-icon',
     ico_path
