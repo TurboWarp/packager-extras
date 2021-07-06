@@ -326,7 +326,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     self.file_to_reveal = None
 
     extract_worker = ExtractWorker(self, self.filename, self.temporary_directory.name)
-    extract_worker.error.connect(self.worker_error)
+    extract_worker.error.connect(self.extract_worker_error)
     extract_worker.extracted.connect(self.finished_extract)
     extract_worker.start()
 
@@ -408,6 +408,10 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
       self.progress_widget.setParent(None)
       self.progress_widget = None
     self.set_enable_controls(True)
+
+  def extract_worker_error(self, err):
+    self.worker_error(err)
+    self.remove()
 
   def worker_error(self, err):
     display_error(err)
