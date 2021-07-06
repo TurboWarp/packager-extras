@@ -243,9 +243,9 @@ class OptionsWorker(BaseThread):
 
   def rezip(self):
     self.update_progress('Recompressing (slow!)')
-    temporary_file = f'{os.path.splitext(self.filename)[0]}.temp'
-    generated_archive_name = shutil.make_archive(temporary_file, 'zip', self.temporary_directory)
-    os.replace(generated_archive_name, self.filename)
+    with tempfile.TemporaryFile() as temporary_archive:
+      generated_archive_name = shutil.make_archive(temporary_archive.name, 'zip', self.temporary_directory)
+      os.replace(generated_archive_name, self.filename)
 
   def _run(self):
     if self.should_fix_icon:
