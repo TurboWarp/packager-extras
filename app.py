@@ -177,13 +177,8 @@ def display_error(err):
   msg.exec_()
 
 def verify_folder(folder):
-  try:
-    # Make sure package.json exists and has valid JSON
-    with open(os.path.join(folder, 'package.json')) as f:
-      json.load(f)
-    return True
-  except:
-    return False
+  # Make sure that a file used by both Electron and NW.js exists
+  return os.path.exists(os.path.join(folder, 'resources.pak'))
 
 def reveal_in_explorer(path):
   path = path.replace('/', '\\')
