@@ -378,13 +378,12 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
       if not fix_icon_checkbox and not create_installer_checkbox:
         raise Exception('You have to check at least one of the boxes')
 
-      self.set_enable_controls(False)
-
       self.file_to_reveal = None
       worker = OptionsWorker(self)
       worker.error.connect(self.worker_error)
       worker.success.connect(self.worker_finished)
 
+      self.set_enable_controls(False)
       self.progress_widget = ProgressWidget()
       self.layout().addWidget(self.progress_widget)
 
