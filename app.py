@@ -305,7 +305,9 @@ class ProgressWidget(QtWidgets.QWidget):
 
 
 class ProjectOptionsWidget(QtWidgets.QWidget):
-  finished = QtCore.pyqtSignal()
+  process_started = QtCore.pyqtSignal()
+  process_ended = QtCore.pyqtSignal()
+  remove_me = QtCore.pyqtSignal()
 
   def __init__(self, filename):
     super().__init__()
@@ -329,6 +331,8 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     extract_worker.start()
 
   def finished_extract(self, extracted_contents):
+    self.process_ended.emit()
+
     self.extracting_widget.setParent(None)
     layout = self.layout()
     self.extracted_contents = extracted_contents
@@ -372,6 +376,8 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
 
   def click(self):
     try:
+      self.process_started.emit()
+
       fix_icon_checkbox = self.fix_icon_checkbox.isChecked()
       create_installer_checkbox = self.create_installer_checkbox.isChecked()
       if not fix_icon_checkbox and not create_installer_checkbox:
@@ -397,6 +403,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     self.remove()
 
   def cleanup(self):
+    self.process_ended.emit()
     if self.progress_widget:
       self.progress_widget.setParent(None)
       self.progress_widget = None
@@ -415,7 +422,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
 
   def remove(self):
     self.temporary_directory.cleanup()
-    self.finished.emit()
+    self.remove_me.emit()
 
 
 class SelectWidget(QtWidgets.QWidget):
@@ -469,6 +476,7 @@ class MainWindow(QtWidgets.QWidget):
       self.update_checker_worker.start()
 
     self.configure_widget = None
+    self.is_process_ongoing = False
 
   def dragEnterEvent(self, event):
     if event.mimeData().hasUrls():
@@ -478,20 +486,44 @@ class MainWindow(QtWidgets.QWidget):
 
   def dropEvent(self, event):
     file = event.mimeData().urls()[0].toLocalFile()
-    self.on_file_selected(file)
+    if not self.is_process_ongoing:
+      self.on_file_selected(file)
+
+  def closeEvent(self, event):
+    if self.is_process_ongoing:
+      reply = QtWidgets.QMessageBox.question(
+        self,
+        'Confirm',
+        'Are you sure you want to leave? The app is still running. We can\'t guarantee it will clean up properly if you close it preemptively.',
+        QtWidgets.QMessageBox.Yes,
+        QtWidgets.QMessageBox.No
+      )
+      if reply == QtWidgets.QMessageBox.Yes:
+        event.accept()
+      else:
+        event.ignore()
 
   def on_file_selected(self, file):
     print(f'Opening {file}')
     try:
       if self.configure_widget:
         raise Exception('Already have a file open')
+      self.is_process_ongoing = True
       self.configure_widget = ProjectOptionsWidget(file)
-      self.configure_widget.finished.connect(self.on_project_done)
+      self.configure_widget.remove_me.connect(self.on_project_done)
+      self.configure_widget.process_started.connect(self.on_process_started)
+      self.configure_widget.process_ended.connect(self.on_process_ended)
       self.layout().addWidget(self.configure_widget)
     except Exception as e:
       handle_error(e)
     else:
       self.select_widget.setParent(None)
+
+  def on_process_started(self):
+    self.is_process_ongoing = True
+
+  def on_process_ended(self):
+    self.is_process_ongoing = False
 
   def on_project_done(self):
     self.configure_widget.setParent(None)
