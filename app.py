@@ -12,7 +12,7 @@ import PyQt5.QtCore as QtCore
 import PyQt5.QtWidgets as QtWidgets
 import PIL.Image
 
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 ENABLE_UPDATE_CHECKER = True
 
 def get_executable_name(path):
