@@ -369,10 +369,10 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     return installer_destination
 
   def set_enable_controls(self, enabled):
-    self.fix_icon_checkbox.setVisible(enabled)
-    self.create_installer_checkbox.setVisible(enabled)
-    self.ok_button.setVisible(enabled)
-    self.cancel_button.setVisible(enabled)
+    if hasattr(self, 'fix_icon_checkbox'): self.fix_icon_checkbox.setVisible(enabled)
+    if hasattr(self, 'create_installer_checkbox'): self.create_installer_checkbox.setVisible(enabled)
+    if hasattr(self, 'ok_button'): self.ok_button.setVisible(enabled)
+    if hasattr(self, 'cancel_button'): self.cancel_button.setVisible(enabled)
 
   def click(self):
     try:
