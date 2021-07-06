@@ -515,6 +515,7 @@ class MainWindow(QtWidgets.QWidget):
 
 
 def main():
+  os.environ['QT_ENABLE_HIGHDPI_SCALING'] = '1'
   app = QtWidgets.QApplication(sys.argv)
   window = MainWindow()
   window.show()
