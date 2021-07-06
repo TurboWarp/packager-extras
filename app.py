@@ -356,12 +356,6 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     self.cancel_button.setFixedHeight(self.cancel_button.sizeHint().height())
     layout.addWidget(self.cancel_button)
 
-  def rezip(self):
-    print('Recompressing')
-    temporary_file = f'{os.path.splitext(self.filename)[0]}.temp'
-    generated_archive_name = shutil.make_archive(temporary_file, 'zip', self.temporary_directory.name)
-    os.replace(generated_archive_name, self.filename)
-
   def pick_installer_destination(self):
     suggested_path = os.path.join(os.path.dirname(self.filename), f'{os.path.splitext(os.path.basename(self.filename))[0]} Setup.exe')
     installer_destination = QtWidgets.QFileDialog.getSaveFileName(self, 'Select where to save the installer', suggested_path, 'Executable files (*.exe)')[0]
