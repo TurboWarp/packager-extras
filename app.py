@@ -10,6 +10,7 @@ import shutil
 import urllib.request
 import PyQt5.QtCore as QtCore
 import PyQt5.QtWidgets as QtWidgets
+import PIL.Image
 
 VERSION = '0.1.0'
 ENABLE_UPDATE_CHECKER = True
@@ -41,14 +42,15 @@ def fix_icon(path):
   package_json = parse_package_json(path)
   icon_file = os.path.join(path, package_json['window']['icon'])
 
+  image = PIL.Image.open(icon_file)
+  ico_path = f'{icon_file}.ico'
+  image.save(ico_path, format='ICO')
+
   run_command([
-    os.path.join(os.path.dirname(__file__), 'third-party/resourcer/Resourcer.exe'),
-    '-op:upd',
-    '-src:' + executable_file,
-    '-type:3',
-    '-name:1',
-    '-lang:1033',
-    '-file:' + icon_file
+    os.path.join(os.path.dirname(__file__), 'third-party/rcedit-x86.exe'),
+    executable_file,
+    '--set-icon',
+    ico_path
   ])
 
 def escape_html(string):
