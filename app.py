@@ -33,7 +33,7 @@ def run_command(args, check=True):
     creationflags=subprocess.CREATE_NO_WINDOW,
     check=check
   )
-  print(completed)
+  print(f'Command {completed.args} finished with code {completed.returncode}')
   return completed
 
 def fix_icon(path):
