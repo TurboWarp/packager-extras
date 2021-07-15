@@ -37,6 +37,13 @@ def run_command(args, check=True):
   print(f'Command {completed.args} finished with code {completed.returncode}')
   return completed
 
+def reload_icons():
+  # https://superuser.com/a/499079
+  if sys.getwindowsversion().major >= 10:
+    run_command(["ie4uinit.exe", "-ClearIconCache"], check=False)
+  else:
+    run_command(["ie4uinit.exe", "-show"], check=False)
+
 def get_icon_as_ico(path: str) -> str:
   # Icon is normally stored as icon.png
   original_icon_name = 'icon.png'
@@ -59,6 +66,7 @@ def fix_icon(path: str):
     '--set-icon',
     icon
   ])
+  reload_icons()
 
 def escape_html(string):
   return (
