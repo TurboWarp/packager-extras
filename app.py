@@ -22,7 +22,7 @@ def get_executable_name(path):
   raise Exception('Cannot find executable')
 
 def parse_package_json(path):
-  with open(os.path.join(path, 'package.json')) as package_json_file:
+  with open(os.path.join(path, 'package.json'), encoding='utf-8') as package_json_file:
     return json.load(package_json_file)
 
 def run_command(args, check=True):
@@ -89,7 +89,7 @@ def unescape_html(string):
   )
 
 def get_project_title(path):
-  with open(os.path.join(path, 'index.html')) as f:
+  with open(os.path.join(path, 'index.html'), encoding='utf-8') as f:
     contents = f.read()
     title = re.search(r'<title>(.*)<\/title>', contents).group(1)
     return unescape_html(title)
@@ -144,7 +144,7 @@ Filename: "{{app}}\{{#EXECUTABLE}}"; Description: "Launch application"; Flags: p
 Type: filesandordirs; Name: "{{localappdata}}\{{#PACKAGE_NAME}}"
 """
   inno_config_path = os.path.join(path, 'config.iss')
-  with open(inno_config_path, 'w') as f:
+  with open(inno_config_path, 'w', encoding='utf-8') as f:
     f.write(inno_config)
 
   run_command([
