@@ -174,7 +174,7 @@ def handle_error(error):
   msg = QtWidgets.QMessageBox()
   msg.setIcon(QtWidgets.QMessageBox.Critical)
   msg.setWindowTitle('Error')
-  msg.setText(str(error))
+  msg.setText(traceback.format_exc())
   msg.exec_()
 
 def display_error(err):
