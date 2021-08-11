@@ -5,7 +5,7 @@ Extra utilities to use after running the TurboWarp Packager. Currently, it can:
  - fix the icon of the executable file
  - create installers
 
-This only works on Windows systems.
+This is only intended to be run on Windows systems. It may work with things like Wine, but it's not tested and not a priority.
 
 Written in Python (only tested on 3.8.0) and PyQt5.
 
