@@ -474,11 +474,11 @@ class MainWindow(QtWidgets.QWidget):
     layout = QtWidgets.QVBoxLayout()
     self.setLayout(layout)
 
-    label = QtWidgets.QLabel('This is <b>beta software</b>. Make sure to <a href="https://github.com/TurboWarp/packager-extras/issues">report bugs</a>. Only run on files you trust.')
-    label.setWordWrap(True)
-    label.setFixedHeight(label.sizeHint().height())
-    label.setOpenExternalLinks(True)
-    layout.addWidget(label)
+    self.label = QtWidgets.QLabel('Report bugs <a href="https://github.com/TurboWarp/packager-extras/issues">on GitHub</a>. Only run on files you trust.')
+    self.label.setWordWrap(True)
+    self.label.setFixedHeight(self.label.sizeHint().height())
+    self.label.setOpenExternalLinks(True)
+    layout.addWidget(self.label)
 
     self.select_widget = SelectWidget()
     self.select_widget.file_selected.connect(self.on_file_selected)
@@ -547,12 +547,7 @@ class MainWindow(QtWidgets.QWidget):
 
   def update_available(self):
     print('An update is available')
-    msg = QtWidgets.QMessageBox()
-    msg.setIcon(QtWidgets.QMessageBox.Information)
-    msg.setWindowTitle('Update Available')
-    msg.setText('An update is available. Visit <a href="https://github.com/TurboWarp/packager-extras/releases">https://github.com/TurboWarp/packager-extras/releases</a> to find out more.')
-    msg.exec_()
-
+    self.label.setText('An update is available. Visit <a href="https://github.com/TurboWarp/packager-extras/releases">https://github.com/TurboWarp/packager-extras/releases</a> to find out more. ' + self.label.text())
 
 def main():
   os.environ['QT_ENABLE_HIGHDPI_SCALING'] = '1'
