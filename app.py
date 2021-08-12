@@ -68,6 +68,14 @@ def fix_icon(path: str):
   ])
   reload_icons()
 
+def make_temporary_file(filename):
+  dirname, pathname = os.path.split(filename)
+  return tempfile.TemporaryFile(dir=dirname, prefix=f'tw-extras-temp-{pathname}')
+
+def make_temporary_directory(filename):
+  dirname, pathname = os.path.split(filename)
+  return tempfile.TemporaryDirectory(dir=dirname, prefix=f'tw-extras-temp-{pathname}')
+
 def escape_html(string):
   return (
      string
@@ -246,7 +254,7 @@ class OptionsWorker(BaseThread):
 
   def rezip(self):
     self.update_progress('Recompressing (slow!)')
-    with tempfile.TemporaryFile() as temporary_archive:
+    with make_temporary_file(self.filename) as temporary_archive:
       generated_archive_name = shutil.make_archive(temporary_archive.name, 'zip', self.temporary_directory)
       os.replace(generated_archive_name, self.filename)
 
@@ -316,7 +324,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     super().__init__()
 
     self.filename = filename
-    self.temporary_directory = tempfile.TemporaryDirectory()
+    self.temporary_directory = make_temporary_directory(self.filename)
 
     layout = QtWidgets.QVBoxLayout()
     layout.setContentsMargins(0, 0, 0, 0)
