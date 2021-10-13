@@ -16,9 +16,16 @@ VERSION = '1.1.0'
 ENABLE_UPDATE_CHECKER = True
 
 def get_executable_name(path):
-  for f in os.listdir(path):
+  files = os.listdir(path)
+  for f in files:
     if f.endswith('.exe') and f != 'notification_helper.exe':
       return f
+  # Couldn't find executable, so try to diagnose what went wrong
+  for f in files:
+    if f == 'libffmpeg.so' or f == 'libvk_swiftshader.so' or f == 'libvulkan.so.1':
+      raise Exception('The file appears to be an Electron Linux app. This app only supports Windows.')
+    if f == 'lib':
+      raise Exception('The file appears to be an NW.js Linux app. This app only supports Windows.')
   raise Exception('Cannot find executable')
 
 def parse_package_json(path):
