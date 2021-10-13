@@ -23,9 +23,9 @@ def get_executable_name(path):
   # Couldn't find executable, so try to diagnose what went wrong
   for f in files:
     if f == 'libffmpeg.so' or f == 'libvk_swiftshader.so' or f == 'libvulkan.so.1':
-      raise Exception('The file appears to be an Electron Linux app. This app only supports Windows.')
+      raise Exception('The file appears to be an Electron Linux app, but this tool only supports Windows applications.')
     if f == 'lib':
-      raise Exception('The file appears to be an NW.js Linux app. This app only supports Windows.')
+      raise Exception('The file appears to be an NW.js Linux app, but this tool only supports Windows applications.')
   raise Exception('Cannot find executable')
 
 def parse_package_json(path):
