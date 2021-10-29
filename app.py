@@ -20,12 +20,6 @@ def get_executable_name(path):
   for f in files:
     if f.endswith('.exe') and f != 'notification_helper.exe':
       return f
-  # Couldn't find executable, so try to diagnose what went wrong
-  for f in files:
-    if f == 'libffmpeg.so' or f == 'libvk_swiftshader.so' or f == 'libvulkan.so.1':
-      raise Exception('The file appears to be an Electron Linux app, but this tool only supports Windows applications.')
-    if f == 'lib':
-      raise Exception('The file appears to be an NW.js Linux app, but this tool only supports Windows applications.')
   raise Exception('Cannot find executable')
 
 def parse_package_json(path):
@@ -224,9 +218,17 @@ def display_error(err):
   msg.setText(err)
   msg.exec_()
 
-def verify_folder(folder):
-  # Make sure that a file used by both Electron and NW.js exists
-  return os.path.exists(os.path.join(folder, 'resources.pak'))
+def check_extracted_zip(folder):
+  files = os.listdir(folder)
+  for f in files:
+    if f == 'libffmpeg.so' or f == 'libvk_swiftshader.so' or f == 'libvulkan.so.1':
+      raise Exception('The file appears to be an Electron Linux app, but this tool only supports Windows apps. (found Linux libraries)')
+    if f == 'lib':
+      raise Exception('The file appears to be an NW.js Linux app, but this tool only supports Windows apps. (found lib folder)')
+    if f == 'Contents':
+      raise Exception('The file appears to be a macOS app, but this tool only supports Windows apps. (found Contents folder)')
+  if not 'resources.pak' in files:
+    raise Exception('Not a valid NW.js or Electron application (resources.pak is missing)')
 
 def reveal_in_explorer(path):
   path = path.replace('/', '\\')
@@ -261,8 +263,7 @@ class ExtractWorker(BaseThread):
       zip.extractall(self.dest)
       extracted_contents = os.path.join(self.dest, get_zip_inner_folder_name(zip))
     print(f'Extracted to {extracted_contents}')
-    if not verify_folder(extracted_contents):
-      raise Exception('Invalid zip selected')
+    check_extracted_zip(extracted_contents)
     self.extracted.emit(extracted_contents)
 
 
