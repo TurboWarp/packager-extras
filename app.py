@@ -29,8 +29,16 @@ def get_executable_name(path):
   raise Exception('Cannot find executable')
 
 def parse_package_json(path):
-  with open(os.path.join(path, 'package.json'), encoding='utf-8') as package_json_file:
+  with open(path, encoding='utf-8') as package_json_file:
     return json.load(package_json_file)
+
+def find_and_parse_package_json(path):
+  try:
+    # Modern Electron
+    return parse_package_json(os.path.join(path, 'resources', 'app', 'package.json'))
+  except FileNotFoundError:
+    # NW.js, old Electron
+    return parse_package_json(os.path.join(path, 'package.json'))
 
 def run_command(args, check=True):
   completed = subprocess.run(
@@ -51,16 +59,25 @@ def reload_icons():
   else:
     run_command(["ie4uinit.exe", "-show"], check=False)
 
-def get_icon_as_ico(path: str) -> str:
-  # Icon is normally stored as icon.png
-  original_icon_name = 'icon.png'
-  # ... Except in certain NW.js builds, where the path is in package.json
-  package_json = parse_package_json(path)
+def find_icon(path):
+  # Modern Electron
+  p = os.path.join(path, 'resources', 'app', 'icon.png')
+  if os.path.exists(p):
+    return p
+  # Old Electron
+  p = os.path.join(path, 'icon.png')
+  if os.path.exists(p):
+    return p
+  # NW.js
+  package_json = find_and_parse_package_json(path)
   if 'window' in package_json:
     original_icon_name = package_json['window']['icon']
-  original_icon_full_path = os.path.join(path, original_icon_name)
-  image = PIL.Image.open(original_icon_full_path)
-  ico_path = f'{original_icon_full_path}.ico'
+  return os.path.join(path, original_icon_name)
+
+def get_icon_as_ico(path: str) -> str:
+  source_icon = find_icon(path)
+  image = PIL.Image.open(source_icon)
+  ico_path = f'{source_icon}.ico'
   image.save(ico_path, format='ICO')
   return ico_path
 
@@ -103,11 +120,19 @@ def unescape_html(string):
       .replace('&amp;', '&')
   )
 
-def get_project_title(path):
-  with open(os.path.join(path, 'index.html'), encoding='utf-8') as f:
+def parse_project_title(path):
+  with open(path, encoding='utf-8') as f:
     contents = f.read()
     title = re.search(r'<title>(.*)<\/title>', contents).group(1)
     return unescape_html(title)
+
+def find_and_parse_project_title(path):
+  try:
+    # Modern Electron
+    return parse_project_title(os.path.join(path, 'resources', 'app', 'index.html'))
+  except FileNotFoundError:
+    # NW.js, old Electron
+    return parse_project_title(os.path.join(path, 'index.html'))
 
 def escape_inno_value(string):
   return (
@@ -118,9 +143,9 @@ def escape_inno_value(string):
 
 def create_installer(path):
   executable_file = get_executable_name(path)
-  package_json = parse_package_json(path)
+  package_json = find_and_parse_package_json(path)
   package_name = package_json['name']
-  title = get_project_title(path)
+  title = find_and_parse_project_title(path)
   version = '1.0.0'
   output_directory = 'Generated Installer'
   output_name = f'{package_name} Setup'
