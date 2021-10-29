@@ -88,11 +88,11 @@ def fix_icon(path: str):
 
 def make_temporary_file(filename):
   dirname, pathname = os.path.split(filename)
-  return tempfile.TemporaryFile(dir=dirname, prefix=f'tw-extras-temp-{pathname}')
+  return tempfile.TemporaryFile(dir=dirname, prefix=f'twtmp{pathname}')
 
 def make_temporary_directory(filename):
   dirname, pathname = os.path.split(filename)
-  return tempfile.TemporaryDirectory(dir=dirname, prefix=f'tw-extras-temp-{pathname}')
+  return tempfile.TemporaryDirectory(dir=dirname, prefix=f'twtmp{pathname}')
 
 def escape_html(string):
   return (
