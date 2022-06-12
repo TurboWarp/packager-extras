@@ -9,6 +9,10 @@ This is only intended to be run on Windows systems. It may work with things like
 
 Written in Python (only tested on 3.8.0) and PyQt5.
 
+Download prebuilt versions from https://github.com/TurboWarp/packager-extras/releases/tag/v1.2.0.
+
+To build locally:
+
 ```bash
 # Setup virtual env
 python -m venv venv
