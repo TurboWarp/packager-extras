@@ -26,4 +26,4 @@ python app.py
 pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-party' app.py
 ```
 
-Some third-party executables are included inside the repository in the `third-party` folder. See the relavent "readme" documents in each folder for more information.
+Some third-party executables are included inside the repository in the `third-party` folder. See the relavent "README.txt" documents in each folder for more information.
