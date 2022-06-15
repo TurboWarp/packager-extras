@@ -27,11 +27,11 @@ pip install -r requirements.txt
 python app.py
 
 # Create final executable for production
-pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-party' --add-data 'icon.png;.' --splash splash.png --name "turbowarp-packager-extras" --icon icon.ico app.py
+pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-party' --add-data 'icon.png;.' --splash splash.png --name "turbowarp-packager-extras" --icon icon.ico --upx-dir upx app.py
 ```
 
-The final executable will be stored in the `dist` folder.
+For best results, optionally download [UPX](https://github.com/upx/upx/releases) and store upx.exe in the `upx` directory. Pyinstaller uses UPX to generate a significantly smaller app.
 
-If possible, download [UPX](https://github.com/upx/upx/releases) and use the `--upx-dir path/to/upx` to tell pyinstaller where it's installed. Pyinstaller will use this to better compress the app.
+The final executable will be stored in the `dist` folder.
 
 Some third-party executables are included inside the repository in the `third-party` folder. See the relevant "README.txt" documents in each folder for more information.
