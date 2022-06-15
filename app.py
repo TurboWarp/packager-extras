@@ -17,6 +17,7 @@ import PIL.Image
 
 VERSION = '1.2.0'
 ENABLE_UPDATE_CHECKER = True
+UPDATE_CHECKER_URL = 'https://raw.githubusercontent.com/TurboWarp/packager-extras/master/version.json'
 
 def get_executable_name(path):
   files = os.listdir(path)
@@ -347,14 +348,38 @@ class OptionsWorker(BaseThread):
       self.update_progress('Created installer')
     self.success.emit()
 
+def parse_version(full_version):
+  # Returns (major, minor, patch) or raises an Exception
+  version_number = full_version.split('-')[0]
+  parts = [int(i) for i in version_number.split('.')]
+  if len(parts) != 3:
+    raise Exception(f'Version number does not have exactly 3 parts: {full_version}')
+  return parts
+
+def is_out_of_date(current_version, latest_version):
+  try:
+    major1, minor1, patch1 = parse_version(current_version)
+    major2, minor2, patch2 = parse_version(latest_version)
+  except Exception as e:
+    print("Version check failed:")
+    traceback.print_exc()
+    return False
+  if major2 > major1: return True
+  if major1 > major2: return False
+  if minor2 > minor1: return True
+  if minor1 > minor2: return False
+  if patch2 > patch1: return True
+  if patch1 > patch2: return False
+  return False
+
 class UpdateCheckerWorker(BaseThread):
   update_available = QtCore.Signal()
 
   def _run(self):
-    with urllib.request.urlopen('https://raw.githubusercontent.com/TurboWarp/packager-extras/master/version.json') as response:
+    with urllib.request.urlopen(UPDATE_CHECKER_URL) as response:
       contents = response.read()
       parsed = json.loads(contents)
-      if parsed['latest'] != VERSION:
+      if is_out_of_date(VERSION, parsed['latest']):
         self.update_available.emit()
 
 
@@ -637,7 +662,7 @@ class MainWindow(QtWidgets.QWidget):
 
   def update_available(self):
     print('An update is available')
-    self.label.setText('An update is available. Visit <a href="https://github.com/TurboWarp/packager-extras/releases">https://github.com/TurboWarp/packager-extras/releases</a> to find out more. ' + self.label.text())
+    self.label.setText('An update is available. Visit <a href="https://github.com/TurboWarp/packager-extras/releases">https://github.com/TurboWarp/packager-extras/releases</a> to learn more. ' + self.label.text())
 
 def close_pyinstaller_splash():
   if '_PYIBoot_SPLASH' in os.environ:
