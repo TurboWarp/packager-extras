@@ -357,13 +357,8 @@ def parse_version(full_version):
   return parts
 
 def is_out_of_date(current_version, latest_version):
-  try:
-    major1, minor1, patch1 = parse_version(current_version)
-    major2, minor2, patch2 = parse_version(latest_version)
-  except Exception as e:
-    print("Version check failed:")
-    traceback.print_exc()
-    return False
+  major1, minor1, patch1 = parse_version(current_version)
+  major2, minor2, patch2 = parse_version(latest_version)
   if major2 > major1: return True
   if major1 > major2: return False
   if minor2 > minor1: return True
@@ -377,6 +372,10 @@ class UpdateCheckerWorker(BaseThread):
 
   def _run(self):
     with urllib.request.urlopen(UPDATE_CHECKER_URL) as response:
+      status = response.status
+      if status != 200:
+        raise Exception(f'Unexpected status code while checking for updates: {status}')
+
       contents = response.read()
       parsed = json.loads(contents)
       if is_out_of_date(VERSION, parsed['latest']):
