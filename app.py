@@ -413,7 +413,7 @@ def is_out_of_date(current_version, latest_version):
   return False
 
 class UpdateCheckerWorker(BaseThread):
-  update_available = QtCore.Signal()
+  update_available = QtCore.Signal(str)
 
   def _run(self):
     with urllib.request.urlopen(UPDATE_CHECKER_URL) as response:
@@ -423,8 +423,9 @@ class UpdateCheckerWorker(BaseThread):
 
       contents = response.read()
       parsed = json.loads(contents)
-      if is_out_of_date(VERSION, parsed['latest']):
-        self.update_available.emit()
+      latest_version = parsed['latest']
+      if is_out_of_date(VERSION, latest_version):
+        self.update_available.emit(latest_version)
 
 
 class ExtractingWidget(QtWidgets.QWidget):
@@ -704,9 +705,9 @@ class MainWindow(QtWidgets.QWidget):
     self.configure_widget = None
     self.layout().addWidget(self.select_widget)
 
-  def update_available(self):
+  def update_available(self, latest_version):
     print('An update is available')
-    self.label.setText('An update is available. Visit <a href="https://github.com/TurboWarp/packager-extras/releases">https://github.com/TurboWarp/packager-extras/releases</a> to learn more. ' + self.label.text())
+    self.label.setText(f'An update is available. <a href="https://github.com/TurboWarp/packager-extras/releases">Download v{escape_html(latest_version)} from GitHub releases</a>. ' + self.label.text())
 
 def close_pyinstaller_splash():
   if '_PYIBoot_SPLASH' in os.environ:
