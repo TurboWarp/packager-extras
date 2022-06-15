@@ -14,15 +14,19 @@ Written in Python (3.10.1) and PySide 2 (Qt5).
 To build locally:
 
 ```powershell
-# Setup virtual env
+# Create virtual env
 python -m venv venv
-# Activate with the appropriate script for your platform in venv/Scripts, eg.
+
+# Activate virtual env with the appropriate script for your platform in venv/Scripts, eg.
 .\venv\Scripts\Activate.ps1 # Powershell
+
 # Install dependencies
 pip install -r requirements.txt
-# Start the app
+
+# Start the app for development
 python app.py
-# Create executable
+
+# Create final executable for production
 pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-party' --splash splash.png -n "turbowarp-packager-extras" app.py
 ```
 
