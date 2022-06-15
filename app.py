@@ -590,10 +590,19 @@ class MainWindow(QtWidgets.QWidget):
     print('An update is available')
     self.label.setText('An update is available. Visit <a href="https://github.com/TurboWarp/packager-extras/releases">https://github.com/TurboWarp/packager-extras/releases</a> to find out more. ' + self.label.text())
 
+def close_pyinstaller_splash():
+  if '_PYIBoot_SPLASH' in os.environ:
+    try:
+      import pyi_splash
+      pyi_splash.close()
+    except ImportError:
+      pass
+
 def main():
   os.environ['QT_ENABLE_HIGHDPI_SCALING'] = '1'
   app = QtWidgets.QApplication(sys.argv)
   window = MainWindow()
+  close_pyinstaller_splash()
   window.show()
   sys.exit(app.exec_())
 

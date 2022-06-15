@@ -23,7 +23,7 @@ pip install -r requirements.txt
 # Start the app
 python app.py
 # Create executable
-pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-party' -n "turbowarp-packager-extras" app.py
+pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-party' --splash splash.png -n "turbowarp-packager-extras" app.py
 ```
 
 The final executable will be stored in the `dist` folder.
