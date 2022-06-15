@@ -242,18 +242,6 @@ def display_error(err):
   msg.setText(f"{err}\n\nInclude a full screenshot of this message in any bug reports or support requests.")
   msg.exec_()
 
-def check_extracted_zip(folder):
-  files = os.listdir(folder)
-  for f in files:
-    if f == 'libffmpeg.so' or f == 'libvk_swiftshader.so' or f == 'libvulkan.so.1':
-      raise Exception('The file appears to be an Electron Linux app, but this tool only supports Windows apps. (found Linux libraries)')
-    if f == 'lib':
-      raise Exception('The file appears to be an NW.js Linux app, but this tool only supports Windows apps. (found lib folder)')
-    if f == 'Contents':
-      raise Exception('The file appears to be a macOS app, but this tool only supports Windows apps. (found Contents folder)')
-  if not 'resources.pak' in files:
-    raise Exception('Not a valid Electron or NW.js application. Make sure the file is a .zip file generated using an "Electron Windows application" or "NW.js Windows application" environment, not the plain "Zip" environment. (resources.pak is missing)')
-
 def reveal_in_explorer(path):
   path = path.replace('/', '\\')
   print(f'Trying to reveal {path}')
@@ -262,7 +250,6 @@ def reveal_in_explorer(path):
     '/select,',
     path
   ], check=False)
-
 
 def get_debug_info():
   type, value, tb = sys.exc_info()
@@ -289,12 +276,72 @@ class BaseThread(QtCore.QThread):
       traceback.print_exc()
       self.error.emit(get_debug_info())
 
-def get_zip_inner_folder_name(zip):
-  info = zip.filelist[0]
-  return info.filename.split('/')[0]
+def get_zip_inner_folders(zip):
+  inner_folders = set()
+  for i in zip.filelist:
+    filename = i.filename
+    inner_folder = filename.split('/')[0]
+    inner_folders.add(inner_folder)
+  return inner_folders
 
 def get_zip_members_in_folder(zip, prefix):
-  return [i.filename for i in zip.filelist if i.filename.startswith(f"{prefix}/")]
+  return [i.filename for i in zip.filelist if i.filename.startswith(f'{prefix}/')]
+
+def parse_zip(zip):
+  if len(zip.filelist) == 0:
+    raise Exception('Zip is empty.')
+
+  inner_folders = get_zip_inner_folders(zip)
+  if len(inner_folders) == 0:
+    raise Exception('Zip has no inner folders.')
+  if len(inner_folders) != 1:
+    if 'index.html' in inner_folders:
+      raise Exception('Zip appears to use a plain zip environment, but the zip must be generated using an "Electron Windows application" or "NW.js Windows application" environment. (found index.html)')
+    formatted_inner_folders = ', '.join(inner_folders)
+    raise Exception(f'Zip has too many inner folders: {formatted_inner_folders}')
+
+  inner_folder = inner_folders.pop()
+  print(f'Inner folder: {inner_folder}')
+
+  def does_file_exist(name):
+    for i in zip.filelist:
+      if i.filename == f'{inner_folder}/{name}':
+        return True
+    return False
+
+  def does_any_filename_contain(name):
+    for i in zip.filelist:
+      if name in i.filename:
+        return True
+    return False
+
+  electron_linux_libraries = [
+    'libffmpeg.so',
+    'libvk_swiftshader.so',
+    'libvulkan.so.1'
+  ]
+  for i in electron_linux_libraries:
+    if does_file_exist(i):
+      raise Exception(f'Zip appears to be an Electron Linux app, but this tool only supports Windows apps. (found {i})')
+
+  nwjs_linux_libraries = [
+    'lib/libnw.so',
+    'lib/libnode.so',
+    'lib/libGLESv2.so',
+    'lib/libffmpeg.so',
+    'lib/libEGL.so'
+  ]
+  for i in nwjs_linux_libraries:
+    if does_file_exist(i):
+      raise Exception(f'Zip appears to be an NW.js Linux app, but this tool only supports Windows apps. (found {i})')
+
+  if does_any_filename_contain('.app/'):
+    raise Exception('Zip appears to be a macOS app, but this tool only supports Windows apps. (found a .app file)')
+
+  if not does_file_exist('resources.pak'):
+    raise Exception('Zip is not a valid Electron or NW.js application. (resources.pak is missing)')
+
+  return inner_folder, get_zip_members_in_folder(zip, inner_folder)
 
 class ExtractWorker(BaseThread):
   extracted = QtCore.Signal(str)
@@ -306,12 +353,10 @@ class ExtractWorker(BaseThread):
 
   def _run(self):
     with zipfile.ZipFile(self.filename) as zip:
-      inner_folder_name = get_zip_inner_folder_name(zip)
-      print(f'Inner folder name: {inner_folder_name}')
-      zip.extractall(self.dest, get_zip_members_in_folder(zip, inner_folder_name))
-      extracted_contents = os.path.join(self.dest, inner_folder_name)
+      inner_folder, members_to_extract = parse_zip(zip)
+      zip.extractall(self.dest, members_to_extract)
+      extracted_contents = os.path.join(self.dest, inner_folder)
     print(f'Extracted to: {extracted_contents}')
-    check_extracted_zip(extracted_contents)
     self.extracted.emit(extracted_contents)
 
 
