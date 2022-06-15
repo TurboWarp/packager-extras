@@ -2,14 +2,14 @@
 
 Extra utilities to use after running the TurboWarp Packager. Currently, it can:
 
- - fix the icon of the executable file
- - create installers
+ - Fix the icon of the executable file
+ - Create installers
 
-This is only intended to be run on Windows systems. It may work with things like Wine, but it's not tested and not a priority.
+Most people will want to download the prebuilt versions from https://github.com/TurboWarp/packager-extras/releases
 
-Written in Python (only tested on 3.8.0) and PyQt5.
+This is only intended to be run on Windows systems. It may work with things like Wine, but Wine support is not tested and not a priority.
 
-Download prebuilt versions from https://github.com/TurboWarp/packager-extras/releases.
+Written in Python (3.10.1) and PyQt5.
 
 To build locally:
 
@@ -26,4 +26,4 @@ python app.py
 pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-party' app.py
 ```
 
-Some third-party executables are included inside the repository in the `third-party` folder. See the relavent "README.txt" documents in each folder for more information.
+Some third-party executables are included inside the repository in the `third-party` folder. See the relevant "README.txt" documents in each folder for more information.
