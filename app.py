@@ -136,10 +136,29 @@ def escape_inno_value(string):
       .replace('"', '')
   )
 
+def verify_safe_for_filesystem(name):
+  unsafe = [
+    '/',
+    '\\',
+    ':',
+    '*',
+    '?',
+    '<',
+    '>',
+    '|'
+  ]
+  for i in unsafe:
+    if i in name:
+      formatted_unsafe = ', '.join(unsafe)
+      raise Exception(f'"{name}" can not use the characters {formatted_unsafe}')
+
 def create_installer(path):
   executable_file = get_executable_name(path)
   package_json = find_and_parse_package_json(path)
+
   package_name = package_json['name']
+  verify_safe_for_filesystem(package_name)
+
   title = find_and_parse_project_title(path)
   version = '1.0.0'
   output_directory = 'Generated Installer'
