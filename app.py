@@ -269,6 +269,8 @@ def reveal_in_explorer(path):
 
 def get_debug_info():
   type, value, tb = sys.exc_info()
+  # Sometimes there can be significant trailing newlines if the error message was generated from a process output
+  exception = str(value).strip()
   platform_info = f"{platform.system()} {platform.release()} {platform.machine()}"
   version_info = VERSION
   if tb is not None:
@@ -278,7 +280,7 @@ def get_debug_info():
     formatted_traceback = "\n".join([format_raw_traceback(i) for i in raw_tracebacks])
   else:
     formatted_traceback = ""
-  return f"\n\nDebug info:\n{formatted_traceback}  ({version_info} {platform_info})"
+  return f"{exception}\n\nDebug info:\n{formatted_traceback}  ({version_info} {platform_info})"
 
 class BaseThread(QtCore.QThread):
   error = QtCore.Signal(str)
@@ -288,7 +290,7 @@ class BaseThread(QtCore.QThread):
       self._run()
     except Exception as e:
       traceback.print_exc()
-      self.error.emit(f"{e}{get_debug_info()}")
+      self.error.emit(get_debug_info())
 
 
 class ExtractWorker(BaseThread):
