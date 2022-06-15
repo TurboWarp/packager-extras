@@ -336,7 +336,7 @@ class OptionsWorker(BaseThread):
 
   def _run(self):
     if self.should_fix_icon:
-      self.update_progress('Fixing icon')
+      self.update_progress('Creating EXE with fixed icon')
       fix_icon(self.extracted_contents)
       self.rezip()
       self.update_progress('EXE with fixed icon stored in original zip')
@@ -344,6 +344,7 @@ class OptionsWorker(BaseThread):
       self.update_progress('Creating installer (very slow!!)')
       generated_installer_path = create_installer(self.extracted_contents)
       os.replace(generated_installer_path, self.installer_destination)
+      self.update_progress('Created installer')
     self.success.emit()
 
 class UpdateCheckerWorker(BaseThread):
