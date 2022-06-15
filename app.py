@@ -265,6 +265,18 @@ def reveal_in_explorer(path):
     path
   ], check=False)
 
+
+def get_debug_info():
+  type, value, tb = sys.exc_info()
+  if tb is None:
+    return '(none)'
+  raw_tracebacks = traceback.extract_tb(tb)
+  raw_tracebacks.reverse()
+  def format_raw_traceback(tb):
+    return f"    at {tb.name} in {os.path.basename(tb.filename)}:{tb.lineno}"
+  formatted_traceback = "\n".join([format_raw_traceback(i) for i in raw_tracebacks])
+  return f"{formatted_traceback} ({VERSION})"
+
 class BaseThread(QtCore.QThread):
   error = QtCore.Signal(str)
 
@@ -273,7 +285,8 @@ class BaseThread(QtCore.QThread):
       self._run()
     except Exception as e:
       traceback.print_exc()
-      self.error.emit(str(e))
+      formatted_traceback = get_debug_info()
+      self.error.emit(f"{e}\n\n{formatted_traceback}")
 
 
 class ExtractWorker(BaseThread):
