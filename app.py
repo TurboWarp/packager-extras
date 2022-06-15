@@ -185,11 +185,15 @@ OutputDir={escape_inno_value(output_directory)}
 OutputBaseFilename={escape_inno_value(output_name)}
 SetupIconFile={escape_inno_value(icon)}
 
+[Tasks]
+Name: "desktopicon"; Description: "{{cm:CreateDesktopIcon}}"; GroupDescription: "{{cm:AdditionalIcons}}"
+
 [Files]
 Source: "*"; DestDir: "{{app}}"; Excludes: "*.iss"; Flags: recursesubdirs ignoreversion
 
 [Icons]
 Name: "{{group}}\{{#TITLE}}"; Filename: "{{app}}\{{#EXECUTABLE}}"
+Name: "{{userdesktop}}\{{#TITLE}}"; Filename: "{{app}}\{{#EXECUTABLE}}"; Tasks: desktopicon
 
 [Run]
 Filename: "{{app}}\{{#EXECUTABLE}}"; Description: "Launch application"; Flags: postinstall nowait skipifsilent
