@@ -227,13 +227,9 @@ def display_success(message):
   msg.setText(message)
   msg.exec_()
 
-def handle_error(error):
+def handle_error():
   traceback.print_exc()
-  msg = QtWidgets.QMessageBox()
-  msg.setIcon(QtWidgets.QMessageBox.Critical)
-  msg.setWindowTitle('Error')
-  msg.setText(traceback.format_exc())
-  msg.exec_()
+  display_error(get_debug_info())
 
 def display_error(err):
   msg = QtWidgets.QMessageBox()
@@ -543,7 +539,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
       fix_icon_checkbox = self.fix_icon_checkbox.isChecked()
       create_installer_checkbox = self.create_installer_checkbox.isChecked()
       if not fix_icon_checkbox and not create_installer_checkbox:
-        raise Exception('You have to check at least one of the boxes')
+        raise Exception('You have to check at least one of the boxes.')
 
       self.file_to_reveal = None
       worker = OptionsWorker(self)
@@ -558,7 +554,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
       worker.start()
     except Exception as e:
       self.cleanup()
-      handle_error(e)
+      handle_error()
 
   def click_cancel(self):
     self.remove()
@@ -691,8 +687,8 @@ class MainWindow(QtWidgets.QWidget):
       self.configure_widget.process_started.connect(self.on_process_started)
       self.configure_widget.process_ended.connect(self.on_process_ended)
       self.layout().addWidget(self.configure_widget)
-    except Exception as e:
-      handle_error(e)
+    except Exception:
+      handle_error()
     else:
       self.select_widget.setParent(None)
 
