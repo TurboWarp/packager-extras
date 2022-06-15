@@ -28,4 +28,6 @@ pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-part
 
 The final executable will be stored in the `dist` folder.
 
+If possible, download [UPX](https://github.com/upx/upx/releases) and use the `--upx-dir path/to/upx` to tell pyinstaller where it's installed. Pyinstaller will use this to better compress the app.
+
 Some third-party executables are included inside the repository in the `third-party` folder. See the relevant "README.txt" documents in each folder for more information.
