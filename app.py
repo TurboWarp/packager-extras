@@ -228,7 +228,7 @@ def check_extracted_zip(folder):
     if f == 'Contents':
       raise Exception('The file appears to be a macOS app, but this tool only supports Windows apps. (found Contents folder)')
   if not 'resources.pak' in files:
-    raise Exception('Not a valid NW.js or Electron application (resources.pak is missing)')
+    raise Exception('Not a valid Electron or NW.js application (resources.pak is missing)')
 
 def reveal_in_explorer(path):
   path = path.replace('/', '\\')
@@ -457,7 +457,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     self.remove()
 
   def worker_error(self, err):
-    display_error(f'{err}\n\nMake sure the file you selected was a .zip file generated using either the "Electron Windows application" or "NW.js Windows application" environments.')
+    display_error(f'{err}\n\nMake sure the file is a .zip file generated using an "Electron Windows application" or "NW.js Windows application" environment, not the plain "Zip" environment.')
     self.cleanup()
 
   def worker_finished(self):
