@@ -18,7 +18,7 @@ To build locally:
 python -m venv venv
 
 # Activate virtual env with the appropriate script for your platform in venv/Scripts, eg.
-.\venv\Scripts\Activate.ps1 # Powershell
+.\venv\Scripts\Activate.ps1 # PowerShell
 
 # Install dependencies
 pip install -r requirements.txt
