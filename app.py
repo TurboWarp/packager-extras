@@ -385,12 +385,14 @@ class OptionsWorker(BaseThread):
       self.update_progress('Creating EXE with fixed icon')
       fix_icon(self.extracted_contents)
       self.rezip()
-      self.update_progress('EXE with fixed icon stored in original zip')
+      self.update_progress('Replaced EXE in original zip with fixed icon')
+
     if self.should_create_installer:
       self.update_progress('Creating installer (very slow!!)')
       generated_installer_path = create_installer(self.extracted_contents)
       shutil.move(generated_installer_path, self.installer_destination)
       self.update_progress('Created installer')
+
     self.success.emit()
 
 def parse_version(full_version):
