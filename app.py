@@ -384,7 +384,7 @@ class OptionsWorker(BaseThread):
       self.update_progress('Creating EXE with fixed icon')
       fix_icon(self.extracted_contents)
       self.rezip()
-      self.update_progress('Replaced EXE in original zip with fixed icon')
+      self.update_progress('Replaced EXE in original zip with fixed icon EXE')
 
     if self.should_create_installer:
       self.update_progress('Creating installer (very slow!!)')
