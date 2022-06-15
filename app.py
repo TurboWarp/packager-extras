@@ -502,7 +502,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     label.setFixedHeight(label.sizeHint().height())
     layout.addWidget(label)
 
-    self.fix_icon_checkbox = QtWidgets.QCheckBox('Fix icon of .exe')
+    self.fix_icon_checkbox = QtWidgets.QCheckBox('Fix icon of .EXE')
     self.fix_icon_checkbox.setChecked(True)
     layout.addWidget(self.fix_icon_checkbox)
 
