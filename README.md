@@ -13,7 +13,7 @@ Download prebuilt versions from https://github.com/TurboWarp/packager-extras/rel
 
 To build locally:
 
-```bash
+```powershell
 # Setup virtual env
 python -m venv venv
 # Activate with the appropriate script for your platform in venv/Scripts, eg.
