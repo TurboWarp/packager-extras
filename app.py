@@ -7,9 +7,11 @@ import tempfile
 import traceback
 import re
 import shutil
+import ctypes
 import urllib.request
 import PySide2.QtCore as QtCore
 import PySide2.QtWidgets as QtWidgets
+import PySide2.QtGui as QtGui
 import PIL.Image
 
 VERSION = '1.2.0'
@@ -500,7 +502,11 @@ class MainWindow(QtWidgets.QWidget):
     super().__init__()
 
     self.resize(300, 200)
+
+    dirname = os.path.dirname(__file__)
+    self.setWindowIcon(QtGui.QIcon(os.path.join(dirname, 'icon.png')))
     self.setWindowTitle('Packager Extras')
+
     self.setWindowFlags(QtCore.Qt.WindowCloseButtonHint | QtCore.Qt.WindowMinimizeButtonHint)
     self.setAcceptDrops(True)
 
@@ -591,6 +597,9 @@ def close_pyinstaller_splash():
       pass
 
 def main():
+  # this terrible thing makes the app icon actually appear on the Windows task bar
+  ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(u'org.turbowarp.packager.extras.' + VERSION)
+
   os.environ['QT_ENABLE_HIGHDPI_SCALING'] = '1'
   app = QtWidgets.QApplication(sys.argv)
   window = MainWindow()

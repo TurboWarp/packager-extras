@@ -27,7 +27,7 @@ pip install -r requirements.txt
 python app.py
 
 # Create final executable for production
-pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-party' --splash splash.png -n "turbowarp-packager-extras" app.py
+pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-party' --add-data 'icon.png;.' --splash splash.png --name "turbowarp-packager-extras" --icon icon.ico app.py
 ```
 
 The final executable will be stored in the `dist` folder.
