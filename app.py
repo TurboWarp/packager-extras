@@ -219,10 +219,6 @@ Type: filesandordirs; Name: "{{localappdata}}\{{#PACKAGE_NAME}}"
     raise Exception(f'Inno did not output to expected spot: {expected_output_file}')
   return expected_output_file
 
-def get_zip_inner_folder_name(zip):
-  info = zip.filelist[0]
-  return info.filename.split('/')[0]
-
 def display_success(message):
   print(message)
   msg = QtWidgets.QMessageBox()
@@ -293,6 +289,12 @@ class BaseThread(QtCore.QThread):
       traceback.print_exc()
       self.error.emit(get_debug_info())
 
+def get_zip_inner_folder_name(zip):
+  info = zip.filelist[0]
+  return info.filename.split('/')[0]
+
+def get_zip_members_in_folder(zip, prefix):
+  return [i.filename for i in zip.filelist if i.filename.startswith(f"{prefix}/")]
 
 class ExtractWorker(BaseThread):
   extracted = QtCore.Signal(str)
@@ -304,9 +306,11 @@ class ExtractWorker(BaseThread):
 
   def _run(self):
     with zipfile.ZipFile(self.filename) as zip:
-      zip.extractall(self.dest)
-      extracted_contents = os.path.join(self.dest, get_zip_inner_folder_name(zip))
-    print(f'Extracted to {extracted_contents}')
+      inner_folder_name = get_zip_inner_folder_name(zip)
+      print(f'Inner folder name: {inner_folder_name}')
+      zip.extractall(self.dest, get_zip_members_in_folder(zip, inner_folder_name))
+      extracted_contents = os.path.join(self.dest, inner_folder_name)
+    print(f'Extracted to: {extracted_contents}')
     check_extracted_zip(extracted_contents)
     self.extracted.emit(extracted_contents)
 
