@@ -332,7 +332,7 @@ class OptionsWorker(BaseThread):
     self.update_progress('Recompressing (slow!)')
     with make_temporary_file(self.filename) as temporary_archive:
       generated_archive_name = shutil.make_archive(temporary_archive.name, 'zip', self.temporary_directory)
-      os.replace(generated_archive_name, self.filename)
+      shutil.move(generated_archive_name, self.filename)
 
   def _run(self):
     if self.should_fix_icon:
@@ -343,7 +343,7 @@ class OptionsWorker(BaseThread):
     if self.should_create_installer:
       self.update_progress('Creating installer (very slow!!)')
       generated_installer_path = create_installer(self.extracted_contents)
-      os.replace(generated_installer_path, self.installer_destination)
+      shutil.move(generated_installer_path, self.installer_destination)
       self.update_progress('Created installer')
     self.success.emit()
 
