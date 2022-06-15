@@ -367,8 +367,7 @@ class OptionsWorker(BaseThread):
     self.filename = parent.filename
     self.should_fix_icon = parent.fix_icon_checkbox.isChecked()
     self.should_create_installer = parent.create_installer_checkbox.isChecked()
-    if self.should_create_installer:
-      self.installer_destination = parent.pick_installer_destination()
+    self.installer_destination = parent.installer_destination
 
   def update_progress(self, text):
     print(text)
@@ -484,7 +483,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     layout.addWidget(self.extracting_widget)
     self.progress_widget = None
 
-    self.file_to_reveal = None
+    self.installer_destination = None
 
     extract_worker = ExtractWorker(self, self.filename, self.temporary_directory.name)
     extract_worker.error.connect(self.extract_worker_error)
@@ -525,8 +524,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     suggested_path = os.path.join(os.path.dirname(self.filename), f'{os.path.splitext(os.path.basename(self.filename))[0]} Setup.exe')
     installer_destination = QtWidgets.QFileDialog.getSaveFileName(self, 'Select where to save the installer', suggested_path, 'Executable files (*.exe)')[0]
     if not installer_destination:
-      raise Exception('No file selected')
-    self.file_to_reveal = installer_destination
+      return None
     return installer_destination
 
   def set_enable_controls(self, enabled):
@@ -537,14 +535,18 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
 
   def click(self):
     try:
-      self.process_started.emit()
-
-      fix_icon_checkbox = self.fix_icon_checkbox.isChecked()
-      create_installer_checkbox = self.create_installer_checkbox.isChecked()
-      if not fix_icon_checkbox and not create_installer_checkbox:
+      should_fix_icon = self.fix_icon_checkbox.isChecked()
+      should_create_installer = self.create_installer_checkbox.isChecked()
+      if not should_fix_icon and not should_create_installer:
         raise Exception('You have to check at least one of the boxes.')
 
-      self.file_to_reveal = None
+      if should_create_installer:
+        self.installer_destination = self.pick_installer_destination()
+        if self.installer_destination is None:
+          return
+
+      self.process_started.emit()
+
       worker = OptionsWorker(self)
       worker.error.connect(self.worker_error)
       worker.success.connect(self.worker_finished)
@@ -555,7 +557,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
 
       worker.progress_update.connect(self.progress_widget.handle_progress_update)
       worker.start()
-    except Exception as e:
+    except Exception:
       self.cleanup()
       handle_error()
 
@@ -579,8 +581,8 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
 
   def worker_finished(self):
     display_success('Success')
-    if self.file_to_reveal:
-      reveal_in_explorer(self.file_to_reveal)
+    if self.installer_destination:
+      reveal_in_explorer(self.installer_destination)
     self.cleanup()
     self.remove()
 
