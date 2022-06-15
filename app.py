@@ -42,7 +42,8 @@ def run_command(args, check=True):
     args,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
-    stdin=subprocess.PIPE
+    stdin=subprocess.PIPE,
+    creationflags=subprocess.CREATE_NO_WINDOW
   )
   status = completed.returncode
   stdout = completed.stdout.decode("utf8")
