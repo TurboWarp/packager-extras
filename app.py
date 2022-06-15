@@ -46,13 +46,6 @@ def run_command(args, check=True):
   print(f'Command {completed.args} finished with code {completed.returncode}')
   return completed
 
-def reload_icons():
-  # https://superuser.com/a/499079
-  if sys.getwindowsversion().major >= 10:
-    run_command(["ie4uinit.exe", "-ClearIconCache"], check=False)
-  else:
-    run_command(["ie4uinit.exe", "-show"], check=False)
-
 def find_icon(path):
   # Modern Electron
   p = os.path.join(path, 'resources', 'app', 'icon.png')
@@ -84,7 +77,6 @@ def fix_icon(path: str):
     '--set-icon',
     icon
   ])
-  reload_icons()
 
 def make_temporary_file(filename):
   dirname, pathname = os.path.split(filename)
