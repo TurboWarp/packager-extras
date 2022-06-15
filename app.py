@@ -8,8 +8,8 @@ import traceback
 import re
 import shutil
 import urllib.request
-import PyQt5.QtCore as QtCore
-import PyQt5.QtWidgets as QtWidgets
+import PySide2.QtCore as QtCore
+import PySide2.QtWidgets as QtWidgets
 import PIL.Image
 
 VERSION = '1.2.0'
@@ -240,7 +240,7 @@ def reveal_in_explorer(path):
   ], check=False)
 
 class BaseThread(QtCore.QThread):
-  error = QtCore.pyqtSignal(str)
+  error = QtCore.Signal(str)
 
   def run(self):
     try:
@@ -251,7 +251,7 @@ class BaseThread(QtCore.QThread):
 
 
 class ExtractWorker(BaseThread):
-  extracted = QtCore.pyqtSignal(str)
+  extracted = QtCore.Signal(str)
 
   def __init__(self, parent, filename, dest):
     super().__init__(parent)
@@ -268,8 +268,8 @@ class ExtractWorker(BaseThread):
 
 
 class OptionsWorker(BaseThread):
-  progress_update = QtCore.pyqtSignal(str)
-  success = QtCore.pyqtSignal()
+  progress_update = QtCore.Signal(str)
+  success = QtCore.Signal()
 
   def __init__(self, parent):
     super().__init__(parent)
@@ -303,7 +303,7 @@ class OptionsWorker(BaseThread):
     self.success.emit()
 
 class UpdateCheckerWorker(BaseThread):
-  update_available = QtCore.pyqtSignal()
+  update_available = QtCore.Signal()
 
   def _run(self):
     with urllib.request.urlopen('https://raw.githubusercontent.com/TurboWarp/packager-extras/master/version.json') as response:
@@ -349,9 +349,9 @@ class ProgressWidget(QtWidgets.QWidget):
 
 
 class ProjectOptionsWidget(QtWidgets.QWidget):
-  process_started = QtCore.pyqtSignal()
-  process_ended = QtCore.pyqtSignal()
-  remove_me = QtCore.pyqtSignal()
+  process_started = QtCore.Signal()
+  process_ended = QtCore.Signal()
+  remove_me = QtCore.Signal()
 
   def __init__(self, filename):
     super().__init__()
@@ -473,7 +473,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
 
 
 class SelectWidget(QtWidgets.QWidget):
-  file_selected = QtCore.pyqtSignal(str)
+  file_selected = QtCore.Signal(str)
 
   def __init__(self):
     super().__init__()
