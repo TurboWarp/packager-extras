@@ -37,15 +37,22 @@ def find_and_parse_package_json(path):
     return parse_package_json(os.path.join(path, 'package.json'))
 
 def run_command(args, check=True):
+  # Don't set check in subprocess.run. We will check it later after logging.
   completed = subprocess.run(
     args,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
-    stdin=subprocess.PIPE,
-    creationflags=subprocess.CREATE_NO_WINDOW,
-    check=check
+    stdin=subprocess.PIPE
   )
-  print(f'Command {completed.args} finished with code {completed.returncode}')
+  status = completed.returncode
+  stdout = completed.stdout.decode("utf8")
+  stderr = completed.stderr.decode("utf8")
+  print(f'Finished command {completed.args} with exit status {status}.')
+  print('Stdout:', stdout)
+  print('Stderr:', stderr)
+  if check and completed.returncode != 0:
+    logged_error = stderr if stderr else stdout
+    raise Exception(f"Command {completed.args} failed with code {status}.\n\n{logged_error}")
   return completed
 
 def find_icon(path):
@@ -171,6 +178,7 @@ Filename: "{{app}}\{{#EXECUTABLE}}"; Description: "Launch application"; Flags: p
 [UninstallDelete]
 Type: filesandordirs; Name: "{{localappdata}}\{{#PACKAGE_NAME}}"
 """
+  print("Inno config", inno_config)
   inno_config_path = os.path.join(path, 'config.iss')
   with open(inno_config_path, 'w', encoding='utf-8') as f:
     f.write(inno_config)
@@ -182,7 +190,7 @@ Type: filesandordirs; Name: "{{localappdata}}\{{#PACKAGE_NAME}}"
 
   expected_output_file = os.path.join(path, output_directory, f'{output_name}.exe')
   if not os.path.exists(expected_output_file):
-    raise Exception('Did not output to expected spot')
+    raise Exception(f'Inno did not output to expected spot: {expected_output_file}')
   return expected_output_file
 
 def get_zip_inner_folder_name(zip):
