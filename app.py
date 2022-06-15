@@ -7,6 +7,7 @@ import tempfile
 import traceback
 import re
 import shutil
+import platform
 import ctypes
 import urllib.request
 import PySide2.QtCore as QtCore
@@ -241,7 +242,7 @@ def display_error(err):
   msg = QtWidgets.QMessageBox()
   msg.setIcon(QtWidgets.QMessageBox.Critical)
   msg.setWindowTitle('Error')
-  msg.setText(err)
+  msg.setText(f"{err}\n\nInclude a full screenshot of this message in any bug reports or support requests.")
   msg.exec_()
 
 def check_extracted_zip(folder):
@@ -268,14 +269,16 @@ def reveal_in_explorer(path):
 
 def get_debug_info():
   type, value, tb = sys.exc_info()
-  if tb is None:
-    return '(none)'
-  raw_tracebacks = traceback.extract_tb(tb)
-  raw_tracebacks.reverse()
-  def format_raw_traceback(tb):
-    return f"    at {tb.name} in {os.path.basename(tb.filename)}:{tb.lineno}"
-  formatted_traceback = "\n".join([format_raw_traceback(i) for i in raw_tracebacks])
-  return f"{formatted_traceback} ({VERSION})"
+  platform_info = f"{platform.system()} {platform.release()} {platform.machine()}"
+  version_info = VERSION
+  if tb is not None:
+    raw_tracebacks = reversed(traceback.extract_tb(tb))
+    def format_raw_traceback(tb):
+      return f"  at {tb.name} in {os.path.basename(tb.filename)}:{tb.lineno}"
+    formatted_traceback = "\n".join([format_raw_traceback(i) for i in raw_tracebacks])
+  else:
+    formatted_traceback = ""
+  return f"\n\nDebug info:\n{formatted_traceback}  ({version_info} {platform_info})"
 
 class BaseThread(QtCore.QThread):
   error = QtCore.Signal(str)
@@ -285,8 +288,7 @@ class BaseThread(QtCore.QThread):
       self._run()
     except Exception as e:
       traceback.print_exc()
-      formatted_traceback = get_debug_info()
-      self.error.emit(f"{e}\n\n{formatted_traceback}")
+      self.error.emit(f"{e}{get_debug_info()}")
 
 
 class ExtractWorker(BaseThread):
