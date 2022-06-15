@@ -321,6 +321,7 @@ class OptionsWorker(BaseThread):
       self.update_progress('Fixing icon')
       fix_icon(self.extracted_contents)
       self.rezip()
+      self.update_progress('EXE with fixed icon stored in original zip')
     if self.should_create_installer:
       self.update_progress('Creating installer (very slow!!)')
       generated_installer_path = create_installer(self.extracted_contents)
