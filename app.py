@@ -38,6 +38,15 @@ def find_and_parse_package_json(path):
     # NW.js, old Electron
     return parse_package_json(os.path.join(path, 'package.json'))
 
+def get_version_from_package_json(data):
+  if 'version' in data:
+    raw_version = data['version']
+    # We parse the version number and regenerate the string to make sure that it's valid
+    major, minor, patch = parse_version(raw_version)
+    return f'{major}.{minor}.{patch}'
+  # No version number. This code path must continue to exist for compatibility reasons
+  return '1.0.0'
+
 def run_command(args, check=True):
   # Don't set check in subprocess.run. We will check it later after logging.
   completed = subprocess.run(
@@ -163,7 +172,7 @@ def create_installer(path):
   verify_safe_for_filesystem(package_name)
 
   title = find_and_parse_project_title(path)
-  version = '1.0.0'
+  version = get_version_from_package_json(package_json)
   output_directory = 'Generated Installer'
   output_name = f'{package_name} Setup'
   icon = get_icon_as_ico(path)
