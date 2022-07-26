@@ -113,8 +113,8 @@ def escape_html(string):
       .replace('&', '&amp;')
       .replace('>', '&gt;')
       .replace('<', '&lt;')
-      .replace('\'','&apos;')
-      .replace('"','&quot;')
+      .replace('\'', '&apos;')
+      .replace('"', '&quot;')
   )
 
 def unescape_html(string):
