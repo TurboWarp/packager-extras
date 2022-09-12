@@ -2,7 +2,7 @@ altgraph==0.17.2
 future==0.18.2
 pefile==2022.5.30
 Pillow==9.2.0
-pyinstaller==5.3
+pyinstaller==5.4.1
 pyinstaller-hooks-contrib==2022.10
 PySide2==5.15.2.1
 pywin32-ctypes==0.2.0
