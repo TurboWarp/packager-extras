@@ -7,6 +7,8 @@ Extra utilities to use after running the TurboWarp Packager. Currently, it can:
 
 Most people will want to download the prebuilt versions from https://github.com/TurboWarp/packager-extras/releases
 
+To make sure that the average Windows PC will trust your project, send Microsoft the .exe file found inside your .zip file at https://www.microsoft.com/en-us/wdsi/filesubmission.
+
 This is only intended to be run on Windows systems. It may work with things like Wine, but Wine support is not tested and not a priority.
 
 Written in Python (3.10.1) and PySide 2 (Qt5).
