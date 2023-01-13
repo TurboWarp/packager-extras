@@ -1,5 +1,5 @@
 altgraph==0.17.3
-future==0.18.2
+future==0.18.3
 pefile==2022.5.30
 Pillow==9.4.0
 pyinstaller==5.7.0
