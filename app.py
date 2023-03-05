@@ -57,8 +57,8 @@ def run_command(args, check=True):
     creationflags=subprocess.CREATE_NO_WINDOW
   )
   status = completed.returncode
-  stdout = completed.stdout.decode("utf8")
-  stderr = completed.stderr.decode("utf8")
+  stdout = completed.stdout
+  stderr = completed.stderr
   print(f'Finished command {completed.args} with exit status {status}.')
   print('Stdout:', stdout)
   print('Stderr:', stderr)
