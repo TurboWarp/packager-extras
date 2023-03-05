@@ -210,8 +210,22 @@ Name: "{{userdesktop}}\{{#TITLE}}"; Filename: "{{app}}\{{#EXECUTABLE}}"; Tasks: 
 [Run]
 Filename: "{{app}}\{{#EXECUTABLE}}"; Description: "Launch application"; Flags: postinstall nowait skipifsilent
 
-[UninstallDelete]
-Type: filesandordirs; Name: "{{localappdata}}\{{#PACKAGE_NAME}}"
+[Code]
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+begin
+  case CurUninstallStep of
+    usPostUninstall:
+      begin
+        if MsgBox('Remove local user data such as settings and saves?', mbInformation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
+        begin
+          // Electron
+          DelTree(ExpandConstant('{{userappdata}}\{{#PACKAGE_NAME}}'), True, True, True);
+          // NW.js
+          DelTree(ExpandConstant('{{localappdata}}\{{#PACKAGE_NAME}}'), True, True, True);
+        end;
+      end;
+  end;
+end;
 """
   print("Inno config", inno_config)
   inno_config_path = os.path.join(path, 'config.iss')
