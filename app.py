@@ -47,6 +47,13 @@ def get_version_from_package_json(data):
   # No version number. This code path must continue to exist for compatibility reasons
   return '1.0.0'
 
+def try_decode(text):
+  try:
+    return text.decode("utf-8")
+  except UnicodeDecodeError as e:
+    print(f"Failed to decode output: {e}")
+    return text
+
 def run_command(args, check=True):
   # Don't set check in subprocess.run. We will check it later after logging.
   completed = subprocess.run(
@@ -57,10 +64,10 @@ def run_command(args, check=True):
     creationflags=subprocess.CREATE_NO_WINDOW
   )
   status = completed.returncode
-  stdout = completed.stdout
-  stderr = completed.stderr
   print(f'Finished command {completed.args} with exit status {status}.')
+  stdout = try_decode(completed.stdout)
   print('Stdout:', stdout)
+  stderr = try_decode(completed.stderr)
   print('Stderr:', stderr)
   if check and completed.returncode != 0:
     logged_error = stderr if stderr else stdout
