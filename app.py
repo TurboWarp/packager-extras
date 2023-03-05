@@ -217,13 +217,16 @@ Name: "{{userdesktop}}\{{#TITLE}}"; Filename: "{{app}}\{{#EXECUTABLE}}"; Tasks: 
 [Run]
 Filename: "{{app}}\{{#EXECUTABLE}}"; Description: "Launch application"; Flags: postinstall nowait skipifsilent
 
+[CustomMessages]
+DeleteUserData=Remove user data such as settings and saves?
+
 [Code]
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   case CurUninstallStep of
     usPostUninstall:
       begin
-        if MsgBox('Remove local user data such as settings and saves?', mbInformation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
+        if MsgBox(CustomMessage('DeleteUserData'), mbInformation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
         begin
           // Electron
           DelTree(ExpandConstant('{{userappdata}}\{{#PACKAGE_NAME}}'), True, True, True);
