@@ -155,30 +155,38 @@ def escape_inno_value(string):
       .replace('"', '')
   )
 
-def verify_safe_for_filesystem(name):
-  unsafe = [
-    '/',
-    '\\',
-    ':',
-    '*',
-    '?',
-    '<',
-    '>',
-    '|'
-  ]
-  for i in unsafe:
+UNSAFE_FILESYSTEM_CHARACTERS = [
+  '/',
+  '\\',
+  ':',
+  '*',
+  '?',
+  '<',
+  '>',
+  '|'
+]
+
+def contains_unsafe_characters(name):
+  for i in UNSAFE_FILESYSTEM_CHARACTERS:
     if i in name:
-      formatted_unsafe = ', '.join(unsafe)
-      raise Exception(f'"{name}" can not use the characters {formatted_unsafe}')
+      return True
+  return False
+
+def replace_unsafe_characters(name, replace_with):
+  for i in UNSAFE_FILESYSTEM_CHARACTERS:
+    name = name.replace(i, replace_with)
+  return name
 
 def create_installer(path):
   executable_file = get_executable_name(path)
   package_json = find_and_parse_package_json(path)
 
   package_name = package_json['name']
-  verify_safe_for_filesystem(package_name)
+  if contains_unsafe_characters(package_name):
+    formatted_unsafe_characters = ', '.join(UNSAFE_FILESYSTEM_CHARACTERS)
+    raise Exception(f'Package name "{package_name}" should not use the characters: {formatted_unsafe_characters}')
 
-  title = find_and_parse_project_title(path)
+  title = replace_unsafe_characters(find_and_parse_project_title(path), '')
   version = get_version_from_package_json(package_json)
   output_directory = 'Generated Installer'
   output_name = f'{package_name} Setup'
@@ -216,7 +224,7 @@ Name: "{{group}}\{{#TITLE}}"; Filename: "{{app}}\{{#EXECUTABLE}}"
 Name: "{{userdesktop}}\{{#TITLE}}"; Filename: "{{app}}\{{#EXECUTABLE}}"; Tasks: desktopicon
 
 [Run]
-Filename: "{{app}}\{{#EXECUTABLE}}"; Description: "Launch application"; Flags: postinstall nowait skipifsilent
+Filename: "{{app}}\{{#EXECUTABLE}}"; Description: "{{cm:LaunchProgram,{escape_inno_value(title)}}}"; Flags: postinstall nowait skipifsilent
 
 [CustomMessages]
 DeleteUserData=Remove user data such as settings and saves?
