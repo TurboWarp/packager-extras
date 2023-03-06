@@ -15,7 +15,7 @@ import PySide2.QtWidgets as QtWidgets
 import PySide2.QtGui as QtGui
 import PIL.Image
 
-VERSION = '1.4.0'
+VERSION = '1.5.0'
 ENABLE_UPDATE_CHECKER = True
 UPDATE_CHECKER_URL = 'https://raw.githubusercontent.com/TurboWarp/packager-extras/master/version.json'
 
