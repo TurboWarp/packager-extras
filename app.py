@@ -248,7 +248,8 @@ end;
 """
   print("Inno config", inno_config)
   inno_config_path = os.path.join(path, 'config.iss')
-  with open(inno_config_path, 'w', encoding='utf-8') as f:
+  # Need to save as UTF 8 with BOM so that Inno Setup Chinese characters correctly
+  with open(inno_config_path, 'w', encoding='utf-8-sig') as f:
     f.write(inno_config)
 
   run_command([
