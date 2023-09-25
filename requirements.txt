@@ -1,4 +1,4 @@
-altgraph==0.17.3
+altgraph==0.17.4
 future==0.18.3
 pefile==2023.2.7
 Pillow==10.0.1
