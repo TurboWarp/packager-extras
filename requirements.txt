@@ -1,7 +1,7 @@
 altgraph==0.17.4
 future==0.18.3
 pefile==2023.2.7
-Pillow==10.0.1
+Pillow==10.1.0
 pyinstaller==5.13.2
 pyinstaller-hooks-contrib==2023.8
 PySide2==5.15.2.1
