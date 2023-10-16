@@ -3,7 +3,7 @@ future==0.18.3
 pefile==2023.2.7
 Pillow==10.0.1
 pyinstaller==5.13.2
-pyinstaller-hooks-contrib==2023.8
+pyinstaller-hooks-contrib==2023.10
 PySide2==5.15.2.1
 pywin32-ctypes==0.2.2
 shiboken2==5.15.2.1
