@@ -119,7 +119,7 @@ def fix_exe_metadata(path: str):
   ]
 
   # non-ascii characters cause rcedit to silently fail
-  title = find_and_parse_project_title(path).encode('ascii', errors='ignore').decode()
+  title = find_and_parse_project_title(path).encode('ascii', errors='ignore').decode().strip()
   if title:
     args += [
       '--set-version-string',
