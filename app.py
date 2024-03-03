@@ -10,6 +10,7 @@ import shutil
 import platform
 import ctypes
 import urllib.request
+from datetime import datetime
 import PyQt5.QtCore as QtCore
 import PyQt5.QtWidgets as QtWidgets
 import PyQt5.QtGui as QtGui
@@ -102,14 +103,56 @@ def get_icon_as_ico(path: str) -> str:
   return ico_path
 
 def fix_exe_metadata(path: str):
+  # we want to do roughly the same thing as electron-builder
+  # https://github.com/electron-userland/electron-builder/blob/cb335ecfef1f4fd1aef94020c1eaf5ce91bef574/packages/app-builder-lib/src/winPackager.ts#L280-L295
+
   executable_file = os.path.join(path, get_executable_name(path))
-  icon = get_icon_as_ico(path)
-  run_command([
+  args = [
     os.path.join(os.path.dirname(__file__), 'third-party/rcedit/rcedit-x86.exe'),
     executable_file,
+  ]
+
+  icon = get_icon_as_ico(path)
+  args += [
     '--set-icon',
     icon
-  ])
+  ]
+
+  # non-ascii characters cause rcedit to silently fail
+  title = find_and_parse_project_title(path).encode('ascii', errors='ignore').decode()
+  if title:
+    args += [
+      '--set-version-string',
+      'ProductName',
+      title,
+      '--set-version-string',
+      'InternalName',
+      title,
+      '--set-version-string',
+      'OriginalFilename',
+      ''
+    ]
+
+  package_json = find_and_parse_package_json(path)
+  version = get_version_from_package_json(package_json)
+  args += [
+    '--set-version-string',
+    'FileDescription',
+    title,
+    '--set-product-version',
+    version,
+    '--set-file-version',
+    f'{version}.0', # windows wants 4 numbers
+  ]
+
+  current_year = datetime.now().year
+  args += [
+    '--set-version-string',
+    'LegalCopyright',
+    f'Copyright (C) {current_year}', # we can't make any assumptions about who owns it or what they want
+  ]
+
+  run_command(args)
 
 def make_temporary_file(filename):
   dirname, pathname = os.path.split(filename)
