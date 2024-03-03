@@ -27,8 +27,13 @@ pip install -r requirements.txt
 python app.py
 
 # Create final executable for production
-pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-party' --add-data 'icon.png;.' --splash splash.png --name "turbowarp-packager-extras" --icon icon.ico --upx-dir upx app.py
+pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-party' --add-data 'icon.png;.' --splash splash.png --name "turbowarp-packager-extras" --version-file file_version_info.txt --icon icon.ico --upx-dir upx app.py
 ```
+
+For each release:
+
+ - Update VERSION in app.py
+ - Update various versions in file_version_info.txt
 
 For best results, optionally download [UPX](https://github.com/upx/upx/releases) and store upx.exe in the `upx` directory. Pyinstaller uses UPX to generate a significantly smaller app.
 
