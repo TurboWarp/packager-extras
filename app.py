@@ -203,8 +203,8 @@ def create_installer(path):
 AppName={{#PACKAGE_NAME}}
 AppVersion={{#VERSION}}
 WizardStyle=classic
-DefaultDirName={{autopf}}\{{#PACKAGE_NAME}}
-UninstallDisplayIcon={{app}}\{{#EXECUTABLE}}
+DefaultDirName={{autopf}}\\{{#PACKAGE_NAME}}
+UninstallDisplayIcon={{app}}\\{{#EXECUTABLE}}
 DefaultGroupName={{#TITLE}}
 PrivilegesRequired=lowest
 Compression=lzma2
@@ -220,11 +220,11 @@ Name: "desktopicon"; Description: "{{cm:CreateDesktopIcon}}"; GroupDescription: 
 Source: "*"; DestDir: "{{app}}"; Excludes: "*.iss"; Flags: recursesubdirs ignoreversion
 
 [Icons]
-Name: "{{group}}\{{#TITLE}}"; Filename: "{{app}}\{{#EXECUTABLE}}"
-Name: "{{userdesktop}}\{{#TITLE}}"; Filename: "{{app}}\{{#EXECUTABLE}}"; Tasks: desktopicon
+Name: "{{group}}\\{{#TITLE}}"; Filename: "{{app}}\\{{#EXECUTABLE}}"
+Name: "{{userdesktop}}\\{{#TITLE}}"; Filename: "{{app}}\\{{#EXECUTABLE}}"; Tasks: desktopicon
 
 [Run]
-Filename: "{{app}}\{{#EXECUTABLE}}"; Description: "{{cm:LaunchProgram,{escape_inno_value(title)}}}"; Flags: postinstall nowait skipifsilent
+Filename: "{{app}}\\{{#EXECUTABLE}}"; Description: "{{cm:LaunchProgram,{escape_inno_value(title)}}}"; Flags: postinstall nowait skipifsilent
 
 [CustomMessages]
 DeleteUserData=Remove user data such as settings and saves?
@@ -238,9 +238,9 @@ begin
         if MsgBox(CustomMessage('DeleteUserData'), mbInformation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
         begin
           // Electron
-          DelTree(ExpandConstant('{{userappdata}}\{{#PACKAGE_NAME}}'), True, True, True);
+          DelTree(ExpandConstant('{{userappdata}}\\{{#PACKAGE_NAME}}'), True, True, True);
           // NW.js
-          DelTree(ExpandConstant('{{localappdata}}\{{#PACKAGE_NAME}}'), True, True, True);
+          DelTree(ExpandConstant('{{localappdata}}\\{{#PACKAGE_NAME}}'), True, True, True);
         end;
       end;
   end;
