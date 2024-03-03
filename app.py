@@ -101,7 +101,7 @@ def get_icon_as_ico(path: str) -> str:
   image.save(ico_path, format='ICO')
   return ico_path
 
-def fix_icon(path: str):
+def fix_exe_metadata(path: str):
   executable_file = os.path.join(path, get_executable_name(path))
   icon = get_icon_as_ico(path)
   run_command([
@@ -415,7 +415,7 @@ class OptionsWorker(BaseThread):
     self.temporary_directory = parent.temporary_directory.name
     self.extracted_contents = parent.extracted_contents
     self.filename = parent.filename
-    self.should_fix_icon = parent.fix_icon_checkbox.isChecked()
+    self.should_fix_exe_metadata = parent.fix_exe_metadata.isChecked()
     self.should_create_installer = parent.create_installer_checkbox.isChecked()
     self.installer_destination = parent.installer_destination
 
@@ -430,11 +430,11 @@ class OptionsWorker(BaseThread):
       shutil.move(generated_archive_name, self.filename)
 
   def _run(self):
-    if self.should_fix_icon:
-      self.update_progress('Creating EXE with fixed icon')
-      fix_icon(self.extracted_contents)
+    if self.should_fix_exe_metadata:
+      self.update_progress('Creating EXE with fixed metadata')
+      fix_exe_metadata(self.extracted_contents)
       self.rezip()
-      self.update_progress('Replaced EXE in original zip with fixed icon EXE')
+      self.update_progress('Replaced EXE in original zip with fixed metadata EXE')
 
     if self.should_create_installer:
       self.update_progress('Creating installer (very slow!!)')
@@ -555,9 +555,9 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     label.setFixedHeight(label.sizeHint().height())
     layout.addWidget(label)
 
-    self.fix_icon_checkbox = QtWidgets.QCheckBox('Fix icon of .EXE')
-    self.fix_icon_checkbox.setChecked(True)
-    layout.addWidget(self.fix_icon_checkbox)
+    self.fix_exe_metadata = QtWidgets.QCheckBox('Fix .EXE icon and metadata')
+    self.fix_exe_metadata.setChecked(True)
+    layout.addWidget(self.fix_exe_metadata)
 
     self.create_installer_checkbox = QtWidgets.QCheckBox('Create installer')
     self.create_installer_checkbox.setChecked(True)
@@ -581,16 +581,16 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
     return installer_destination
 
   def set_enable_controls(self, enabled):
-    if hasattr(self, 'fix_icon_checkbox'): self.fix_icon_checkbox.setVisible(enabled)
+    if hasattr(self, 'fix_exe_metadata'): self.fix_exe_metadata.setVisible(enabled)
     if hasattr(self, 'create_installer_checkbox'): self.create_installer_checkbox.setVisible(enabled)
     if hasattr(self, 'ok_button'): self.ok_button.setVisible(enabled)
     if hasattr(self, 'cancel_button'): self.cancel_button.setVisible(enabled)
 
   def click(self):
     try:
-      should_fix_icon = self.fix_icon_checkbox.isChecked()
+      should_fix_exe_metadata = self.fix_exe_metadata.isChecked()
       should_create_installer = self.create_installer_checkbox.isChecked()
-      if not should_fix_icon and not should_create_installer:
+      if not should_fix_exe_metadata and not should_create_installer:
         raise Exception('You have to check at least one of the boxes.')
 
       if should_create_installer:
