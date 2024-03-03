@@ -1,4 +1,4 @@
-rcedit v1.1.1 from https://github.com/electron/rcedit
+rcedit v2.0.0 from https://github.com/electron/rcedit
 
 License:
 Copyright (c) 2013 GitHub Inc.
