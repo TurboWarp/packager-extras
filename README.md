@@ -9,7 +9,7 @@ Most people will want to download the prebuilt versions from https://github.com/
 
 This is only intended to be run on Windows systems. It may work with things like Wine, but Wine support is not tested and not a priority.
 
-Written in Python (3.10.1) and PySide 2 (Qt5).
+Written in Python (3.12.2) and PyQt5.
 
 To build locally:
 
