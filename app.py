@@ -10,9 +10,9 @@ import shutil
 import platform
 import ctypes
 import urllib.request
-import PySide2.QtCore as QtCore
-import PySide2.QtWidgets as QtWidgets
-import PySide2.QtGui as QtGui
+import PyQt5.QtCore as QtCore
+import PyQt5.QtWidgets as QtWidgets
+import PyQt5.QtGui as QtGui
 import PIL.Image
 
 VERSION = '1.5.0'
@@ -306,7 +306,7 @@ def get_debug_info():
   return f"{exception}\n\nDebug info:\n{formatted_traceback}  ({version_info} {platform_info})"
 
 class BaseThread(QtCore.QThread):
-  error = QtCore.Signal(str)
+  error = QtCore.pyqtSignal(str)
 
   def run(self):
     try:
@@ -383,7 +383,7 @@ def parse_zip(zip):
   return inner_folder, get_zip_members_in_folder(zip, inner_folder)
 
 class ExtractWorker(BaseThread):
-  extracted = QtCore.Signal(str)
+  extracted = QtCore.pyqtSignal(str)
 
   def __init__(self, parent, filename, dest):
     super().__init__(parent)
@@ -400,8 +400,8 @@ class ExtractWorker(BaseThread):
 
 
 class OptionsWorker(BaseThread):
-  progress_update = QtCore.Signal(str)
-  success = QtCore.Signal()
+  progress_update = QtCore.pyqtSignal(str)
+  success = QtCore.pyqtSignal()
 
   def __init__(self, parent):
     super().__init__(parent)
@@ -457,7 +457,7 @@ def is_out_of_date(current_version, latest_version):
   return False
 
 class UpdateCheckerWorker(BaseThread):
-  update_available = QtCore.Signal(str)
+  update_available = QtCore.pyqtSignal(str)
 
   def _run(self):
     with urllib.request.urlopen(UPDATE_CHECKER_URL) as response:
@@ -508,9 +508,9 @@ class ProgressWidget(QtWidgets.QWidget):
 
 
 class ProjectOptionsWidget(QtWidgets.QWidget):
-  process_started = QtCore.Signal()
-  process_ended = QtCore.Signal()
-  remove_me = QtCore.Signal()
+  process_started = QtCore.pyqtSignal()
+  process_ended = QtCore.pyqtSignal()
+  remove_me = QtCore.pyqtSignal()
 
   def __init__(self, filename):
     super().__init__()
@@ -635,7 +635,7 @@ class ProjectOptionsWidget(QtWidgets.QWidget):
 
 
 class SelectWidget(QtWidgets.QWidget):
-  file_selected = QtCore.Signal(str)
+  file_selected = QtCore.pyqtSignal(str)
 
   def __init__(self):
     super().__init__()
