@@ -386,6 +386,8 @@ def parse_zip(zip):
   if len(inner_folders) != 1:
     if 'index.html' in inner_folders:
       raise Exception('Zip appears to use a plain zip environment, but the zip must be generated using an "Electron Windows application" or "NW.js Windows application" environment. (found index.html)')
+    if 'project.json' in inner_folders:
+      raise Exception('Zip appears to be a Scratch project. Please use packager.turbowarp.org to generate an  an "Electron Windows application" or "NW.js Windows application" application, then upload that zip into this program. (found project.json)')
     formatted_inner_folders = ', '.join(inner_folders)
     raise Exception(f'Zip has too many inner folders: {formatted_inner_folders}')
 
