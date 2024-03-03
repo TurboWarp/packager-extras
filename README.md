@@ -40,3 +40,9 @@ For best results, optionally download [UPX](https://github.com/upx/upx/releases)
 The final executable will be stored in the `dist` folder.
 
 Some third-party executables are included inside the repository in the `third-party` folder. See the relevant "README.txt" documents in each folder for more information.
+
+## License
+
+TurboWarp Packager Extras is licensed under the GNU General Public License version 3. See LICENSE for more information.
+
+The output of TurboWarp Packager Extras is a derivative work of the packaged project you selected but NOT a derivative work of TurboWarp Packager Extras itself.
