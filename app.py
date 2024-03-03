@@ -19,6 +19,11 @@ VERSION = '1.5.0'
 ENABLE_UPDATE_CHECKER = True
 UPDATE_CHECKER_URL = 'https://raw.githubusercontent.com/TurboWarp/packager-extras/master/version.json'
 
+class InvalidVersion(Exception):
+  def __init__(self, version):
+    super().__init__(f'Invalid version: {version}')
+    self.version = version
+
 def get_executable_name(path):
   files = os.listdir(path)
   for f in files:
@@ -292,6 +297,8 @@ def reveal_in_explorer(path):
 
 def get_debug_info():
   type, value, tb = sys.exc_info()
+  if type is InvalidVersion:
+    return f'The project\'s version number "{value.version}" is invalid. Repackage the project using a verison number that is exactly three numbers separated by periods, like 1.0.0 or 1.2.3.'
   # Sometimes there can be significant trailing newlines if the error message was generated from a process output
   exception = str(value).strip()
   platform_info = f"{platform.system()} {platform.release()} {platform.machine()}"
@@ -438,11 +445,14 @@ class OptionsWorker(BaseThread):
     self.success.emit()
 
 def parse_version(full_version):
-  # Returns (major, minor, patch) or raises an Exception
-  version_number = full_version.split('-')[0]
-  parts = [int(i) for i in version_number.split('.')]
+  # Returns (major, minor, patch) or raises an InvalidVersion exception
+  try:
+    version_number = full_version.split('-')[0]
+    parts = [int(i) for i in version_number.split('.')]
+  except ValueError:
+    raise InvalidVersion(full_version)
   if len(parts) != 3:
-    raise Exception(f'Version number does not have exactly 3 parts: {full_version}')
+    raise InvalidVersion(full_version)
   return parts
 
 def is_out_of_date(current_version, latest_version):
