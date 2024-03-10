@@ -17,8 +17,8 @@ To build locally:
 # Create virtual env
 python -m venv venv
 
-# Activate virtual env with the appropriate script for your platform in venv/Scripts, eg.
-.\venv\Scripts\Activate.ps1 # PowerShell
+# Activate virtual env with the appropriate script for your platform in venv/Scripts, eg. for PowerShell:
+.\venv\Scripts\Activate.ps1
 
 # Install dependencies
 pip install -r requirements.txt
@@ -26,8 +26,11 @@ pip install -r requirements.txt
 # Start the app for development
 python app.py
 
-# Create final executable for production
+# Create executable
 pyinstaller --noconsole --noconfirm --add-data 'third-party;third-party' --add-data 'icon.png;.' --name "turbowarp-packager-extras" --version-file file_version_info.txt --icon icon.ico app.py
+
+# Create zip
+Compress-Archive -Path "dist/turbowarp-packager-extras" -DestinationPath "dist/turbowarp-packager-extras.zip" -Force
 ```
 
 For each release:
