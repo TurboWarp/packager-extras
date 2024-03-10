@@ -18,7 +18,7 @@ import PIL.Image
 
 VERSION = '1.6.0'
 ENABLE_UPDATE_CHECKER = True
-UPDATE_CHECKER_URL = 'https://raw.githubusercontent.com/TurboWarp/packager-extras/master/version.json'
+UPDATE_CHECKER_URL = 'https://packager.turbowarp.org/extras-version.json'
 
 class InvalidVersion(Exception):
   def __init__(self, version):
