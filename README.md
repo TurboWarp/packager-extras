@@ -27,7 +27,7 @@ pip install -r requirements.txt
 python app.py
 
 # Create final executable for production
-pyinstaller --noconsole --onefile --noconfirm --add-data 'third-party;third-party' --add-data 'icon.png;.' --splash splash.png --name "turbowarp-packager-extras" --version-file file_version_info.txt --icon icon.ico --upx-dir upx app.py
+pyinstaller --noconsole --noconfirm --add-data 'third-party;third-party' --add-data 'icon.png;.' --name "turbowarp-packager-extras" --version-file file_version_info.txt --icon icon.ico --upx-dir upx app.py
 ```
 
 For each release:
