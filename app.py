@@ -380,23 +380,9 @@ def parse_zip(zip):
   if len(zip.filelist) == 0:
     raise Exception('Zip is empty.')
 
-  inner_folders = get_zip_inner_folders(zip)
-  if len(inner_folders) == 0:
-    raise Exception('Zip has no inner folders.')
-  if len(inner_folders) != 1:
-    if 'index.html' in inner_folders:
-      raise Exception('Zip appears to use a plain zip environment, but the zip must be generated using an "Electron Windows application" or "NW.js Windows application" environment. (found index.html)')
-    if 'project.json' in inner_folders:
-      raise Exception('Zip appears to be a Scratch project. Please use packager.turbowarp.org to generate an  an "Electron Windows application" or "NW.js Windows application" application, then upload that zip into this program. (found project.json)')
-    formatted_inner_folders = ', '.join(inner_folders)
-    raise Exception(f'Zip has too many inner folders: {formatted_inner_folders}')
-
-  inner_folder = inner_folders.pop()
-  print(f'Inner folder: {inner_folder}')
-
   def does_file_exist(name):
     for i in zip.filelist:
-      if i.filename == f'{inner_folder}/{name}':
+      if f'/{name}' in i.filename:
         return True
     return False
 
@@ -431,6 +417,20 @@ def parse_zip(zip):
 
   if not does_file_exist('resources.pak'):
     raise Exception('Zip is not a valid Electron or NW.js application. (resources.pak is missing)')
+
+  inner_folders = get_zip_inner_folders(zip)
+  if len(inner_folders) == 0:
+    raise Exception('Zip has no inner folders.')
+  if len(inner_folders) != 1:
+    if 'index.html' in inner_folders:
+      raise Exception('Zip appears to use a plain zip environment, but the zip must be generated using an "Electron Windows application" or "NW.js Windows application" environment. (found index.html)')
+    if 'project.json' in inner_folders:
+      raise Exception('Zip appears to be a Scratch project. Please use packager.turbowarp.org to generate an  an "Electron Windows application" or "NW.js Windows application" application, then upload that zip into this program. (found project.json)')
+    formatted_inner_folders = ', '.join(inner_folders)
+    raise Exception(f'Zip has too many inner folders: {formatted_inner_folders}')
+
+  inner_folder = inner_folders.pop()
+  print(f'Inner folder: {inner_folder}')
 
   return inner_folder, get_zip_members_in_folder(zip, inner_folder)
 
