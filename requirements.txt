@@ -3,7 +3,7 @@ packaging==24.0
 pefile==2023.2.7
 pillow==10.3.0
 pyinstaller==6.5.0
-pyinstaller-hooks-contrib==2024.3
+pyinstaller-hooks-contrib==2024.6
 PyQt5==5.15.10
 PyQt5-Qt5==5.15.13
 PyQt5-sip==12.13.0
