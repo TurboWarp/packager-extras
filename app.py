@@ -16,7 +16,7 @@ import PyQt5.QtWidgets as QtWidgets
 import PyQt5.QtGui as QtGui
 import PIL.Image
 
-VERSION = '1.7.0'
+VERSION = '1.8.0'
 ENABLE_UPDATE_CHECKER = True
 UPDATE_CHECKER_URL = 'https://packager.turbowarp.org/extras-version.json'
 
