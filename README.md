@@ -14,8 +14,8 @@ Written in Python (3.12.2) and PyQt5.
 To build locally:
 
 ```powershell
-# Create virtual env
-python -m venv venv
+# Create virtual env using Python 3.11.9 64-bit
+py -3.11 -m venv venv
 
 # Activate virtual env with the appropriate script for your platform in venv/Scripts, eg. for PowerShell:
 .\venv\Scripts\Activate.ps1
@@ -30,7 +30,7 @@ python app.py
 pyinstaller --noconsole --noconfirm --clean --add-data 'third-party;third-party' --add-data 'icon.png;.' --name "turbowarp-packager-extras" --version-file file_version_info.txt --icon icon.ico app.py
 
 # Create zip
-Compress-Archive -Path "dist/turbowarp-packager-extras" -DestinationPath "dist/turbowarp-packager-extras.zip" -Force
+python generate-zip.py
 ```
 
 For each release:
