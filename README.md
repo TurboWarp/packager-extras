@@ -30,7 +30,7 @@ python app.py
 pyinstaller --noconsole --noconfirm --clean --add-data 'third-party;third-party' --add-data 'icon.png;.' --name "turbowarp-packager-extras" --version-file file_version_info.txt --icon icon.ico app.py
 
 # Create zip
-Compress-Archive -Path "dist/turbowarp-packager-extras" -DestinationPath "dist/turbowarp-packager-extras.zip" -Force
+python generate-zip.py
 ```
 
 For each release:
