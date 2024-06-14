@@ -1,5 +1,5 @@
 altgraph==0.17.4
-packaging==24.0
+packaging==24.1
 pefile==2023.2.7
 pillow==10.3.0
 pyinstaller==6.8.0
