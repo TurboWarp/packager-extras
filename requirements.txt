@@ -1,7 +1,7 @@
 altgraph==0.17.4
 packaging==24.2
 pefile==2024.8.26
-pillow==11.0.0
+pillow==11.1.0
 pyinstaller==6.11.1
 pyinstaller-hooks-contrib==2024.10
 PyQt5==5.15.11
